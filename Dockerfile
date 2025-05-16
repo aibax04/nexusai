@@ -19,9 +19,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Install NumPy first to ensure we use the right version
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir numpy==1.23.5
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 # Second stage - smaller final image
 FROM python:3.10-slim
@@ -58,7 +59,7 @@ RUN chmod +x start.sh
 EXPOSE 8080
 
 # Pre-download models to avoid memory spikes during first request
-RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
+RUN python -c "import numpy; import torch; from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
 
 # Command to run the app with our start script
 CMD ["./start.sh"]

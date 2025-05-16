@@ -11,14 +11,19 @@ from email.message import EmailMessage
 import gc
 import sys
 import logging
+import torch
 
 # Memory optimization
 def optimize_memory():
     gc.collect()
-    if hasattr(torch, 'cuda'):
+    try:
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
-    logging.info(f"Memory optimization performed: {sys.getsizeof(gc.get_objects()) / (1024 * 1024):.2f}MB")
+            logging.info("CUDA memory cleared")
+    except (AttributeError, NameError):
+        logging.info("CUDA not available for memory clearing")
+    
+    logging.info(f"Memory optimization performed: GC collected")
 
 # Set up logging
 logging.basicConfig(
