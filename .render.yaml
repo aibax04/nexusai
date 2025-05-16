@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: nexus-chatbot
+    env: docker
+    plan: free
+    envVars:
+      - key: PINECONE_API_KEY
+        sync: false
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        sync: false

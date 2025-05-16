@@ -1,0 +1,2883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS - Professional Tech Stack Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Add Three.js for WebGL effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+        
+        :root {
+            /* Core color palette */
+            --primary-color: #4361ee;
+            --primary-gradient: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            --secondary-color: #7209b7;
+            --accent-color: #4cc9f0;
+            --accent-gradient: linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%);
+            --success-color: #4ade80;
+            --warning-color: #fbbf24;
+            --danger-color: #f87171;
+            
+            /* Light theme */
+            --bg-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.07), 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+            
+            /* UI components */
+            --header-height: 70px;
+            --sidebar-width: 280px;
+            --card-radius: 16px;
+            --button-radius: 12px;
+            --input-radius: 12px;
+            
+            /* Chat specific */
+            --chat-user-bg: #e0edff;
+            --chat-bot-bg: #f1f5f9;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --surface-color: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.25), 0 4px 6px rgba(0, 0, 0, 0.2);
+            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.3), 0 10px 10px rgba(0, 0, 0, 0.2);
+            
+            --chat-user-bg: #334155;
+            --chat-bot-bg: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: var(--header-height);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.2;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--surface-color);
+            height: var(--header-height);
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background-color: rgba(var(--surface-color), 0.8);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+            padding: 0 2rem;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo {
+            width: 42px;
+            height: 42px;
+            background: var(--primary-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .main-nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            bottom: 0;
+            left: 0;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s;
+            border-radius: 3px;
+        }
+
+        .nav-link:hover:after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            background-color: var(--bg-color);
+        }
+
+        .theme-toggle:hover {
+            color: var(--primary-color);
+            transform: rotate(30deg);
+        }
+
+        .cta-button {
+            background: var(--primary-gradient);
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--button-radius);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Main content */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            padding: 6rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+            margin-bottom: 4rem;
+            border-radius: var(--card-radius);
+            min-height: 80vh;
+            perspective: 1000px;
+        }
+        
+        #webgl-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -4;
+            border-radius: var(--card-radius);
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: var(--primary-gradient);
+            z-index: -3;
+            transform-style: preserve-3d;
+            opacity: 0.7; /* Reduced opacity to let WebGL show through */
+        }
+
+        .hero-pattern {
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10zm10 8c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm40 40c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            z-index: -2;
+            opacity: 0.6;
+            transform: translateZ(20px);
+            transition: all 0.3s ease;
+        }
+
+        .hero-particles {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            z-index: -1;
+            transform-style: preserve-3d;
+        }
+
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+            box-shadow: 0 0 10px 2px rgba(76, 201, 240, 0.3);
+        }
+
+        .particle.glow {
+            background: rgba(76, 201, 240, 0.6);
+            box-shadow: 0 0 15px 5px rgba(76, 201, 240, 0.5);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg) translateZ(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-800px) translateX(200px) rotate(360deg) translateZ(100px);
+                opacity: 0;
+            }
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-size: 50px 50px;
+            background-image: 
+                linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+            z-index: -1;
+            transform: translateZ(10px);
+            transition: all 0.3s ease;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            z-index: 1;
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: white;
+            line-height: 1.1;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transform: translateZ(50px);
+            transition: transform 0.3s ease;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            transform: translateZ(30px);
+            transition: transform 0.3s ease;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+            transform: translateZ(40px);
+            transition: transform 0.3s ease;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--button-radius);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            justify-content: center;
+            width: 100%;
+            transform: translateZ(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item {
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-10px) scale(1.05);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Glow effect */
+        .glow-effect {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(76, 201, 240, 0.4) 0%, rgba(76, 201, 240, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            z-index: 0;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Features Section */
+        .features-section {
+            margin-bottom: 5rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 5rem;
+        }
+
+        .feature-card {
+            background-color: var(--surface-color);
+            border-radius: var(--card-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all 0.4s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            position: relative;
+            z-index: 1;
+            color: white;
+        }
+
+        .feature-icon:before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            padding: 2px;
+            background: var(--primary-gradient);
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            z-index: -1;
+        }
+
+        .feature-icon:after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            background: var(--primary-gradient);
+            opacity: 0.2;
+            z-index: -2;
+        }
+
+        .feature-content {
+            padding: 2rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .feature-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            text-decoration: none;
+            transition: gap 0.3s;
+        }
+
+        .feature-link:hover {
+            gap: 0.75rem;
+        }
+
+        /* Roadmaps Section */
+        .roadmaps-section {
+            margin-bottom: 5rem;
+        }
+
+        .roadmaps-container {
+            margin-top: 3rem;
+        }
+
+        .roadmap-tabs {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .roadmap-tab {
+            background: #181f2e;
+            color: #fff;
+            border-radius: 16px;
+            padding: 0.75rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .roadmap-tab.active,
+        .roadmap-tab:hover {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(67, 97, 238, 0.15);
+        }
+
+        .roadmap-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .roadmap-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        .roadmap-hero {
+            padding: 2rem;
+            border-radius: 24px 24px 0 0;
+            background: linear-gradient(90deg, #4cc9f0 0%, #3a0ca3 100%);
+        }
+
+        .roadmap-hero h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        .roadmap-hero p {
+            font-size: 1.1rem;
+            color: #e0e7ef;
+        }
+
+        .roadmap-step {
+            background: #181f2e;
+            border-radius: 0 0 24px 24px;
+            margin-bottom: 2rem;
+            margin-top: 0;
+            padding: 2rem;
+        }
+
+        .roadmap-step:before {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-color);
+        }
+
+        .roadmap-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-marker {
+            position: absolute;
+            left: -2rem;
+            width: 20px;
+            height: 20px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            box-shadow: 0 0 0 5px var(--surface-color);
+            z-index: 1;
+        }
+
+        .step-content {
+            background-color: var(--bg-color);
+            border-radius: var(--card-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .step-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .step-title h4 {
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        .step-difficulty {
+            font-size: 0.75rem;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .step-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .step-resources {
+            background-color: var(--surface-color);
+            padding: 1rem;
+            border-radius: var(--card-radius);
+            margin-top: 1rem;
+        }
+
+        .step-resources h5 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .resource-list {
+            list-style: none;
+        }
+
+        .resource-item {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .resource-item i {
+            color: var(--primary-color);
+            font-size: 0.75rem;
+        }
+
+        .resource-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Chat Section */
+        .chat-section {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            margin-bottom: 5rem;
+            align-items: start;
+        }
+
+        .chat-info {
+            padding: 2rem;
+        }
+
+        .chat-info h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .chat-info p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.125rem;
+            line-height: 1.7;
+        }
+
+        .chat-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .chat-feature {
+            background-color: var(--surface-color);
+            border-radius: var(--card-radius);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: var(--shadow-sm);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .chat-feature-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            background: var(--primary-gradient);
+        }
+
+        .chat-feature-content h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .chat-feature-content p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0;
+        }
+
+        .chat-container {
+            background-color: var(--surface-color);
+            border-radius: var(--card-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: calc(var(--header-height) + 2rem);
+            max-height: calc(100vh - var(--header-height) - 4rem);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: var(--primary-gradient);
+            padding: 1rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .chat-header-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .chat-header-info h3 {
+            font-weight: 600;
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .chat-header-info p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            display: flex;
+            gap: 1rem;
+            max-width: 85%;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .user-avatar {
+            background: var(--accent-gradient);
+        }
+
+        .bot-avatar {
+            background: var(--primary-gradient);
+        }
+
+        .message-content {
+            padding: 1rem;
+            border-radius: 18px;
+            position: relative;
+            box-shadow: var(--shadow-sm);
+            font-size: 0.9375rem;
+            line-height: 1.6;
+        }
+
+        .user-message {
+            margin-left: auto;
+        }
+
+        .user-message .message-content {
+            background-color: var(--chat-user-bg);
+            border-bottom-right-radius: 4px;
+            color: var(--text-primary);
+        }
+
+        .bot-message .message-content {
+            background-color: var(--chat-bot-bg);
+            border-bottom-left-radius: 4px;
+            color: var(--text-primary);
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+            align-self: flex-end;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 0.5rem 1rem;
+            background-color: var(--chat-bot-bg);
+            border-radius: 18px;
+            width: fit-content;
+            margin-bottom: 1rem;
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: inline-block;
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+
+        .typing-indicator span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .chat-input {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .chat-input-field {
+            flex: 1;
+            display: flex;
+            position: relative;
+        }
+
+        #user-input {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--input-radius);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-size: 0.9375rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        #user-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+        }
+
+        .input-actions {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .input-action {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .input-action:hover {
+            color: var(--primary-color);
+        }
+
+        #send-button {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+                        cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+        }
+
+        #send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* FAQ section */
+        .faq-section {
+            margin-bottom: 5rem;
+        }
+
+        .faq-container {
+            max-width: 900px;
+            margin: 2.5rem auto 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .faq-item {
+            background: #1e293b;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 24px rgba(67, 97, 238, 0.10);
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        .faq-item.active {
+            box-shadow: 0 8px 32px rgba(76, 201, 240, 0.15);
+        }
+
+        .faq-question {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 700;
+            color: #fff;
+            font-size: 1.2rem;
+            transition: color 0.3s;
+            user-select: none;
+        }
+
+        .faq-question i {
+            transition: transform 0.3s;
+            font-size: 1.3rem;
+            color: #a5b4fc;
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+            color: #4cc9f0;
+        }
+
+        .faq-answer {
+            padding: 0 2rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(.4,0,.2,1), padding 0.3s;
+            color: #cbd5e1;
+            font-size: 1.05rem;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 1rem 2rem 2rem 2rem;
+            max-height: 500px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--surface-color);
+            padding: 4rem 2rem 2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary-gradient);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .footer-logo-text {
+            font-weight: 700;
+            font-size: 1.25rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .footer-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-link {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--bg-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+
+        .social-link:hover {
+            color: white;
+            background: var(--primary-gradient);
+            transform: translateY(-3px);
+        }
+
+        .footer-heading {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-link {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-link a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-link a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-newsletter p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        #newsletter-email {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--input-radius);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-size: 0.9375rem;
+            outline: none;
+        }
+
+        #newsletter-email:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+        }
+
+        .newsletter-button {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 0 1.5rem;
+            border-radius: var(--input-radius);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .newsletter-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 3rem auto 0;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .copyright {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .footer-legal {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-legal a {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-legal a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Responsive styles */
+        @media (max-width: 1024px) {
+            .chat-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .chat-container {
+                position: static;
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 0 1rem;
+            }
+            
+            .main-nav {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.125rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .hero-stats {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2rem;
+            }
+            
+            .roadmap-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .roadmap-logo {
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-text {
+                display: none;
+            }
+            
+            .hero {
+                padding: 4rem 1rem;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .feature-card {
+                min-width: 100%;
+            }
+            
+            .step-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .scale-in {
+            animation: scaleIn 0.3s ease-in-out;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .course-card {
+            background: #1e293b;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(67, 97, 238, 0.10);
+            padding: 2rem 1.5rem 1.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .course-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 8px 32px rgba(76, 201, 240, 0.15);
+        }
+        .course-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+        .course-provider {
+            color: #4cc9f0;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .course-meta {
+            font-size: 0.95rem;
+            color: #a5b4fc;
+            margin-bottom: 0.5rem;
+        }
+        .course-description {
+            color: #cbd5e1;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        .course-link {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            color: #fff;
+            border-radius: 8px;
+            padding: 0.5rem 1.2rem;
+            text-decoration: none;
+            font-weight: 600;
+            align-self: flex-start;
+            transition: background 0.2s, transform 0.2s;
+            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.10);
+        }
+        .course-link:hover {
+            background: linear-gradient(135deg, #3a0ca3 0%, #4361ee 100%);
+            transform: translateY(-2px) scale(1.04);
+        }
+
+        .filter-btn {
+          background: #1e293b;
+          color: #4cc9f0;
+          border: none;
+          border-radius: 20px;
+          padding: 0.5rem 1.5rem;
+          font-weight: 600;
+          font-size: 1rem;
+          cursor: pointer;
+          transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+          box-shadow: 0 2px 8px rgba(67, 97, 238, 0.10);
+        }
+        .filter-btn.active,
+        .filter-btn:hover {
+          background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+          color: #fff;
+          box-shadow: 0 4px 16px rgba(67, 97, 238, 0.15);
+        }
+
+        .section-title h2 {
+          font-size: 2.8rem;
+          font-weight: 800;
+          color: #fff;
+          text-align: center;
+          margin-bottom: 0.5rem;
+          font-family: 'Poppins', sans-serif;
+        }
+        .faq-underline {
+          width: 80px;
+          height: 4px;
+          background: linear-gradient(90deg, #4cc9f0 0%, #4361ee 100%);
+          margin: 1rem auto 0;
+          border-radius: 2px;
+        }
+        .faq-container {
+          max-width: 900px;
+          margin: 2.5rem auto 0 auto;
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+        .faq-item {
+          background: #1e293b;
+          border-radius: 1.5rem;
+          box-shadow: 0 4px 24px rgba(67, 97, 238, 0.10);
+          overflow: hidden;
+          transition: box-shadow 0.2s;
+        }
+        .faq-item.active {
+          box-shadow: 0 8px 32px rgba(76, 201, 240, 0.15);
+        }
+        .faq-question {
+          padding: 1.5rem 2rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          cursor: pointer;
+          font-weight: 700;
+          color: #fff;
+          font-size: 1.2rem;
+          transition: color 0.3s;
+          user-select: none;
+        }
+        .faq-question i {
+          transition: transform 0.3s;
+          font-size: 1.3rem;
+          color: #a5b4fc;
+        }
+        .faq-item.active .faq-question i {
+          transform: rotate(180deg);
+          color: #4cc9f0;
+        }
+        .faq-answer {
+          padding: 0 2rem;
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height 0.4s cubic-bezier(.4,0,.2,1), padding 0.3s;
+          color: #cbd5e1;
+          font-size: 1.05rem;
+        }
+        .faq-item.active .faq-answer {
+          padding: 1rem 2rem 2rem 2rem;
+          max-height: 500px;
+        }
+
+        .roadmap-heading {
+          font-size: 2.8rem;
+          font-weight: 900;
+          color: #fff;
+          margin-bottom: 0.5rem;
+          font-family: 'Poppins', sans-serif;
+          text-align: center;
+          letter-spacing: 0.5px;
+        }
+
+        .section-subtitle {
+          color: #e0e7ef;
+          font-size: 1.15rem;
+          text-align: center;
+          margin: 0 auto;
+          max-width: 700px;
+        }
+
+        .features-heading {
+          font-size: 2.8rem;
+          font-weight: 900;
+          color: #fff;
+          margin-bottom: 0.5rem;
+          font-family: 'Poppins', sans-serif;
+          text-align: center;
+          letter-spacing: 0.5px;
+        }
+
+        .section-subtitle {
+          color: #e0e7ef;
+          font-size: 1.15rem;
+          text-align: center;
+          margin: 0 auto;
+          max-width: 700px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header style="position: relative;">
+        <div class="header-container">
+            <div class="logo-container">
+                <div class="logo">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <span class="logo-text">NEXUS</span>
+            </div>
+            
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#features" class="nav-link">Features</a></li>
+                    <li><a href="#roadmaps" class="nav-link">Roadmaps</a></li>
+                    <li><a href="#chat" class="nav-link">Chat</a></li>
+                    <li><a href="#faq" class="nav-link">FAQ</a></li>
+                    <li><a href="#courses" class="nav-link">Courses</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-actions">
+                <button class="theme-toggle" id="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="profile-bar" style="display: flex; align-items: center; gap: 0.75rem; margin-left: 1rem;">
+                    <div style="background: linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%);
+                                width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-user" style="color: #fff; font-size: 1.2rem;"></i>
+                    </div>
+                    <span style="color: #4361ee; font-weight: 600; font-size: 1rem; letter-spacing: 0.5px;">
+                        {{ username|capitalize }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero" id="hero">
+            <canvas id="webgl-canvas"></canvas>
+            <div class="hero-bg"></div>
+            <div class="hero-pattern"></div>
+            <div class="hero-grid"></div>
+            <div class="hero-particles" id="particles"></div>
+            <div class="glow-effect" id="glow-effect"></div>
+            
+            <div class="hero-content">
+                <h1>Your Professional Tech Stack Assistant</h1>
+                <p>NEXUS helps developers navigate complex technology ecosystems with personalized guidance, learning paths, and real-time coding assistance.</p>
+                
+                <div class="hero-buttons">
+                    <a href="#chat" class="cta-button">
+                        Start Chatting
+                        <i class="fas fa-comment-dots"></i>
+                    </a>
+                    <a href="#features" class="btn-secondary">
+                        Explore Features
+                        <i class="fas fa-arrow-down"></i>
+                    </a>
+                </div>
+                
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">
+                            <i class="fas fa-code"></i>
+                            <span>50+</span>
+                        </div>
+                        <div class="stat-label">Tech Stacks</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">
+                            <i class="fas fa-book"></i>
+                            <span>1000+</span>
+                        </div>
+                        <div class="stat-label">Resources</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">
+                            <i class="fas fa-users"></i>
+                            <span>10K+</span>
+                        </div>
+                        <div class="stat-label">Developers</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section" id="features">
+            <div class="section-title" style="text-align: center; margin-bottom: 1.5rem;">
+              <h2 class="features-heading">Powerful Features</h2>
+              <p class="section-subtitle">NEXUS provides everything you need to master modern technologies and build better applications faster.</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-road"></i>
+                        </div>
+                        <h3 class="feature-title">Personalized Roadmaps</h3>
+                        <p class="feature-description">Get customized learning paths based on your current skill level, goals, and preferred technologies.</p>
+                        <a href="#" class="feature-link">
+                            Learn more
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-code-branch"></i>
+                        </div>
+                        <h3 class="feature-title">Stack Recommendations</h3>
+                        <p class="feature-description">Receive expert suggestions for technology stacks tailored to your project requirements.</p>
+                        <a href="#" class="feature-link">
+                            Learn more
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <h3 class="feature-title">Real-time Assistance</h3>
+                        <p class="feature-description">Get instant help with coding problems, debugging, and best practices from our AI assistant.</p>
+                        <a href="#" class="feature-link">
+                            Learn more
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <h3 class="feature-title">Architecture Guidance</h3>
+                        <p class="feature-description">Plan your application architecture with expert recommendations and diagrams.</p>
+                        <a href="#" class="feature-link">
+                            Learn more
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h3 class="feature-title">Interactive Tutorials</h3>
+                        <p class="feature-description">Learn by doing with hands-on coding exercises and guided projects.</p>
+                        <a href="#" class="feature-link">
+                            Learn more
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <h3 class="feature-title">Code Review</h3>
+                        <p class="feature-description">Submit your code for analysis and receive detailed feedback on improvements.</p>
+                        <a href="#" class="feature-link">
+                            Learn more
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Roadmaps Section -->
+        <section class="roadmaps-section" id="roadmaps">
+          <div class="section-title" style="text-align: center; margin-bottom: 1.5rem;">
+            <h2 class="roadmap-heading">Technology Roadmaps</h2>
+            <p class="section-subtitle">Structured learning paths to master any technology stack from beginner to advanced levels.</p>
+          </div>
+          <div class="roadmaps-container">
+            <div class="roadmap-tabs">
+              <div class="roadmap-tab active" data-tab="frontend">Frontend</div>
+              <div class="roadmap-tab" data-tab="backend">Backend</div>
+              <div class="roadmap-tab" data-tab="devops">DevOps</div>
+              <div class="roadmap-tab" data-tab="mobile">Mobile</div>
+              <div class="roadmap-tab" data-tab="datascience">Data Science</div>
+            </div>
+
+            <!-- Frontend Roadmap -->
+            <div class="roadmap-content active" data-tab="frontend">
+              <div class="roadmap-hero" style="background: linear-gradient(90deg, #4cc9f0 0%, #3a0ca3 100%); border-radius: 24px 24px 0 0; padding: 2rem;">
+                <h2 style="color:#fff; font-size:2rem; font-weight:700; margin-bottom:0.5rem;">
+                  <i class="fas fa-atom"></i> Frontend Development Roadmap
+                </h2>
+                <p style="color:#e0e7ef; font-size:1.1rem;">
+                  Master modern frontend development with this comprehensive guide covering HTML, CSS, JavaScript, frameworks, and advanced concepts.
+                </p>
+              </div>
+              <div class="roadmap-step" style="background:#181f2e; border-radius:0 0 24px 24px; margin-bottom:2rem; margin-top:0; padding:2rem;">
+                <div style="display:flex; align-items:center; gap:1rem;">
+                  <div style="width:18px; height:18px; background:#4cc9f0; border-radius:50%;"></div>
+                  <h3 style="color:#fff; font-size:1.3rem; font-weight:700;">HTML &amp; CSS Fundamentals</h3>
+                  <span style="margin-left:auto; background:#4cc9f0; color:#fff; border-radius:12px; padding:0.2rem 1rem; font-size:0.95rem;">Beginner</span>
+                </div>
+                <p style="color:#cbd5e1; margin:1rem 0 0 2.2rem;">Learn the building blocks of web development including semantic HTML, CSS selectors, box model, flexbox, and grid layout.</p>
+                <div style="background:#232b3e; border-radius:16px; margin:1.5rem 0 0 2.2rem; padding:1rem;">
+                  <strong style="color:#fff;">RECOMMENDED RESOURCES</strong>
+                  <ul style="margin:0.5rem 0 0 0; padding:0; list-style:none;">
+                    <li style="margin-bottom:0.5rem;"><a href="https://developer.mozilla.org/en-US/docs/Web/HTML" target="_blank" style="color:#4cc9f0;"><i class="fas fa-link"></i> MDN Web Docs - HTML &amp; CSS</a></li>
+                    <li style="margin-bottom:0.5rem;"><a href="https://css-tricks.com/snippets/css/a-guide-to-flexbox/" target="_blank" style="color:#4cc9f0;"><i class="fas fa-link"></i> CSS Tricks Complete Guide to Flexbox</a></li>
+                    <li><a href="https://www.freecodecamp.org/learn/2022/responsive-web-design/" target="_blank" style="color:#4cc9f0;"><i class="fas fa-video"></i> FreeCodeCamp Responsive Web Design Course</a></li>
+                  </ul>
+                </div>
+              </div>
+              <!-- Add more steps as needed -->
+            </div>
+
+            <!-- Backend Roadmap -->
+            <div class="roadmap-content" data-tab="backend">
+              <div class="roadmap-hero" style="background: linear-gradient(90deg, #43e6ee 0%, #3a0ca3 100%); border-radius: 24px 24px 0 0; padding: 2rem;">
+                <h2 style="color:#fff; font-size:2rem; font-weight:700; margin-bottom:0.5rem;">
+                  <i class="fas fa-server"></i> Backend Development Roadmap
+                </h2>
+                <p style="color:#e0e7ef; font-size:1.1rem;">
+                  Learn backend fundamentals, databases, APIs, authentication, and deployment.
+                </p>
+              </div>
+              <div class="roadmap-step" style="background:#181f2e; border-radius:0 0 24px 24px; margin-bottom:2rem; margin-top:0; padding:2rem;">
+                <div style="display:flex; align-items:center; gap:1rem;">
+                  <div style="width:18px; height:18px; background:#43e6ee; border-radius:50%;"></div>
+                  <h3 style="color:#fff; font-size:1.3rem; font-weight:700;">APIs &amp; Databases</h3>
+                  <span style="margin-left:auto; background:#43e6ee; color:#fff; border-radius:12px; padding:0.2rem 1rem; font-size:0.95rem;">Intermediate</span>
+                </div>
+                <p style="color:#cbd5e1; margin:1rem 0 0 2.2rem;">Build RESTful APIs, connect to SQL/NoSQL databases, and implement authentication.</p>
+                <div style="background:#232b3e; border-radius:16px; margin:1.5rem 0 0 2.2rem; padding:1rem;">
+                  <strong style="color:#fff;">RECOMMENDED RESOURCES</strong>
+                  <ul style="margin:0.5rem 0 0 0; padding:0; list-style:none;">
+                    <li style="margin-bottom:0.5rem;"><a href="https://www.freecodecamp.org/learn/back-end-development-and-apis/" target="_blank" style="color:#43e6ee;"><i class="fas fa-link"></i> FreeCodeCamp Back End Development and APIs</a></li>
+                    <li style="margin-bottom:0.5rem;"><a href="https://www.mongodb.com/developer/products/mongodb/mongodb-basics/" target="_blank" style="color:#43e6ee;"><i class="fas fa-link"></i> MongoDB Basics</a></li>
+                    <li><a href="https://www.digitalocean.com/community/tutorial_series/api-development" target="_blank" style="color:#43e6ee;"><i class="fas fa-link"></i> DigitalOcean API Development Tutorials</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- DevOps Roadmap -->
+            <div class="roadmap-content" data-tab="devops">
+              <div class="roadmap-hero" style="background: linear-gradient(90deg, #43eea1 0%, #3a0ca3 100%); border-radius: 24px 24px 0 0; padding: 2rem;">
+                <h2 style="color:#fff; font-size:2rem; font-weight:700; margin-bottom:0.5rem;">
+                  <i class="fas fa-cogs"></i> DevOps Roadmap
+                </h2>
+                <p style="color:#e0e7ef; font-size:1.1rem;">
+                  Learn CI/CD, containerization, cloud, and infrastructure as code.
+                </p>
+              </div>
+              <div class="roadmap-step" style="background:#181f2e; border-radius:0 0 24px 24px; margin-bottom:2rem; margin-top:0; padding:2rem;">
+                <div style="display:flex; align-items:center; gap:1rem;">
+                  <div style="width:18px; height:18px; background:#43eea1; border-radius:50%;"></div>
+                  <h3 style="color:#fff; font-size:1.3rem; font-weight:700;">CI/CD &amp; Containers</h3>
+                  <span style="margin-left:auto; background:#43eea1; color:#fff; border-radius:12px; padding:0.2rem 1rem; font-size:0.95rem;">Intermediate</span>
+                </div>
+                <p style="color:#cbd5e1; margin:1rem 0 0 2.2rem;">Automate deployments, use Docker/Kubernetes, and manage cloud infrastructure.</p>
+                <div style="background:#232b3e; border-radius:16px; margin:1.5rem 0 0 2.2rem; padding:1rem;">
+                  <strong style="color:#fff;">RECOMMENDED RESOURCES</strong>
+                  <ul style="margin:0.5rem 0 0 0; padding:0; list-style:none;">
+                    <li style="margin-bottom:0.5rem;"><a href="https://www.freecodecamp.org/news/devops-cicd-docker-kubernetes/" target="_blank" style="color:#43eea1;"><i class="fas fa-link"></i> FreeCodeCamp DevOps, CI/CD, Docker, Kubernetes</a></li>
+                    <li><a href="https://www.digitalocean.com/community/tutorials/tag/devops" target="_blank" style="color:#43eea1;"><i class="fas fa-link"></i> DigitalOcean DevOps Tutorials</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mobile Roadmap -->
+            <div class="roadmap-content" data-tab="mobile">
+              <div class="roadmap-hero" style="background: linear-gradient(90deg, #4c6ef5 0%, #3a0ca3 100%); border-radius: 24px 24px 0 0; padding: 2rem;">
+                <h2 style="color:#fff; font-size:2rem; font-weight:700; margin-bottom:0.5rem;">
+                  <i class="fas fa-mobile-alt"></i> Mobile Development Roadmap
+                </h2>
+                <p style="color:#e0e7ef; font-size:1.1rem;">
+                  Learn to build cross-platform mobile apps with React Native, Flutter, and more.
+                </p>
+              </div>
+              <div class="roadmap-step" style="background:#181f2e; border-radius:0 0 24px 24px; margin-bottom:2rem; margin-top:0; padding:2rem;">
+                <div style="display:flex; align-items:center; gap:1rem;">
+                  <div style="width:18px; height:18px; background:#4c6ef5; border-radius:50%;"></div>
+                  <h3 style="color:#fff; font-size:1.3rem; font-weight:700;">Cross-Platform Frameworks</h3>
+                  <span style="margin-left:auto; background:#4c6ef5; color:#fff; border-radius:12px; padding:0.2rem 1rem; font-size:0.95rem;">Intermediate</span>
+                </div>
+                <p style="color:#cbd5e1; margin:1rem 0 0 2.2rem;">Build apps with React Native, Flutter, and learn mobile UI/UX best practices.</p>
+                <div style="background:#232b3e; border-radius:16px; margin:1.5rem 0 0 2.2rem; padding:1rem;">
+                  <strong style="color:#fff;">RECOMMENDED RESOURCES</strong>
+                  <ul style="margin:0.5rem 0 0 0; padding:0; list-style:none;">
+                    <li style="margin-bottom:0.5rem;"><a href="https://reactnative.dev/docs/getting-started" target="_blank" style="color:#4c6ef5;"><i class="fas fa-link"></i> React Native Docs</a></li>
+                    <li><a href="https://flutter.dev/docs" target="_blank" style="color:#4c6ef5;"><i class="fas fa-link"></i> Flutter Docs</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Data Science Roadmap -->
+            <div class="roadmap-content" data-tab="datascience">
+              <div class="roadmap-hero" style="background: linear-gradient(90deg, #43e6ee 0%, #43eea1 100%); border-radius: 24px 24px 0 0; padding: 2rem;">
+                <h2 style="color:#fff; font-size:2rem; font-weight:700; margin-bottom:0.5rem;">
+                  <i class="fas fa-chart-line"></i> Data Science Roadmap
+                </h2>
+                <p style="color:#e0e7ef; font-size:1.1rem;">
+                  Learn Python, data analysis, machine learning, and visualization.
+                </p>
+              </div>
+              <div class="roadmap-step" style="background:#181f2e; border-radius:0 0 24px 24px; margin-bottom:2rem; margin-top:0; padding:2rem;">
+                <div style="display:flex; align-items:center; gap:1rem;">
+                  <div style="width:18px; height:18px; background:#43e6ee; border-radius:50%;"></div>
+                  <h3 style="color:#fff; font-size:1.3rem; font-weight:700;">Python &amp; Machine Learning</h3>
+                  <span style="margin-left:auto; background:#43e6ee; color:#fff; border-radius:12px; padding:0.2rem 1rem; font-size:0.95rem;">Intermediate</span>
+                </div>
+                <p style="color:#cbd5e1; margin:1rem 0 0 2.2rem;">Analyze data, build ML models, and visualize results with Python libraries.</p>
+                <div style="background:#232b3e; border-radius:16px; margin:1.5rem 0 0 2.2rem; padding:1rem;">
+                  <strong style="color:#fff;">RECOMMENDED RESOURCES</strong>
+                  <ul style="margin:0.5rem 0 0 0; padding:0; list-style:none;">
+                    <li style="margin-bottom:0.5rem;"><a href="https://www.coursera.org/learn/python-data-analysis" target="_blank" style="color:#43e6ee;"><i class="fas fa-link"></i> Coursera Python Data Analysis</a></li>
+                    <li><a href="https://www.coursera.org/learn/machine-learning" target="_blank" style="color:#43e6ee;"><i class="fas fa-link"></i> Coursera Machine Learning (Andrew Ng)</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Start of Courses Section -->
+        <section id="courses" style="padding: 3rem 0; background: #0f172a;">
+            <div style="max-width: 1200px; margin: 0 auto; padding: 0 1rem;">
+                <h2 style="color: #4cc9f0; font-family: 'Poppins',sans-serif; font-size: 2.2rem; font-weight: 700; text-align: center; margin-bottom: 2.5rem;">
+                    <i class="fas fa-certificate"></i> Free Certificate Courses
+                </h2>
+                <p style="text-align:center; color:#94a3b8; margin-bottom:2.5rem;">
+                    Curated from <a href="https://panx.io/awesome-certificates/" target="_blank" style="color:#4cc9f0;">Awesome Certificates</a> — all courses are free and offer a certificate or badge upon completion.
+                </p>
+
+                <!-- Filter Buttons -->
+                <div id="course-filters" style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-bottom: 2.5rem;">
+                    <button class="filter-btn active" data-category="all">All</button>
+                    <button class="filter-btn" data-category="security">Security</button>
+                    <button class="filter-btn" data-category="frontend">Front-End</button>
+                    <button class="filter-btn" data-category="backend">Back-End</button>
+                    <button class="filter-btn" data-category="datascience">Data Science</button>
+                    <button class="filter-btn" data-category="business">Business</button>
+                    <button class="filter-btn" data-category="design">Design</button>
+                    <button class="filter-btn" data-category="cloud">Cloud</button>
+                    <button class="filter-btn" data-category="devops">DevOps</button>
+                    <button class="filter-btn" data-category="ai">AI & ML</button>
+                </div>
+
+                <!-- Courses Grid -->
+                <div id="courses-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+                    <!-- Example Course Card (repeat for each course, add data-category attribute) -->
+                    <!-- Security -->
+                    <div class="course-card" data-category="security">
+                        <div class="course-title">Intro to Cybersecurity</div>
+                        <div class="course-provider">Cisco Networking Academy</div>
+                        <div class="course-meta">Beginner &bull; 15 hours &bull; 🏅 Badge</div>
+                        <div class="course-description">Learn the basics of cybersecurity and how to protect networks and systems.</div>
+                        <a class="course-link" href="https://www.netacad.com/courses/cybersecurity/introduction-cybersecurity" target="_blank">Go to Course</a>
+                    </div>
+                    <div class="course-card" data-category="security">
+                        <div class="course-title">Cybersecurity Essentials</div>
+                        <div class="course-provider">Cisco Networking Academy</div>
+                        <div class="course-meta">Intermediate &bull; 30 hours &bull; 🏅 Badge</div>
+                        <div class="course-description">Intermediate cybersecurity skills for protecting digital assets.</div>
+                        <a class="course-link" href="https://www.netacad.com/courses/cybersecurity/cybersecurity-essentials" target="_blank">Go to Course</a>
+                    </div>
+                    <!-- Front-End -->
+                    <div class="course-card" data-category="frontend">
+                        <div class="course-title">Responsive Web Design Certification</div>
+                        <div class="course-provider">FreeCodeCamp</div>
+                        <div class="course-meta">Professional &bull; 300 hours &bull; 🏆 Certificate</div>
+                        <div class="course-description">Learn HTML, CSS, and responsive design principles to build modern websites.</div>
+                        <a class="course-link" href="https://www.freecodecamp.org/learn/2022/responsive-web-design/" target="_blank">Go to Course</a>
+                    </div>
+                    <div class="course-card" data-category="frontend">
+                        <div class="course-title">Front-End Libraries Certification</div>
+                        <div class="course-provider">FreeCodeCamp</div>
+                        <div class="course-meta">Professional &bull; 300 hours &bull; 🏆 Certificate</div>
+                        <div class="course-description">Master front-end libraries like React, Redux, Bootstrap, jQuery, and SASS.</div>
+                        <a class="course-link" href="https://www.freecodecamp.org/learn/front-end-development-libraries/" target="_blank">Go to Course</a>
+                    </div>
+                    <!-- Back-End -->
+                    <div class="course-card" data-category="backend">
+                        <div class="course-title">Back End Development and APIs Certification</div>
+                        <div class="course-provider">FreeCodeCamp</div>
+                        <div class="course-meta">Professional &bull; 300 hours &bull; 🏆 Certificate</div>
+                        <div class="course-description">Learn to build APIs and back-end applications with Node.js and Express.</div>
+                        <a class="course-link" href="https://www.freecodecamp.org/learn/back-end-development-and-apis/" target="_blank">Go to Course</a>
+                    </div>
+                    <div class="course-card" data-category="backend">
+                        <div class="course-title">MongoDB Basics</div>
+                        <div class="course-provider">MongoDB University</div>
+                        <div class="course-meta">Beginner &bull; 8.5 hours &bull; 🏆 Certificate</div>
+                        <div class="course-description">Learn the fundamentals of MongoDB and NoSQL database management.</div>
+                        <a class="course-link" href="https://university.mongodb.com/courses/M001/about" target="_blank">Go to Course</a>
+                    </div>
+                    <!-- Data Science -->
+                    <div class="course-card" data-category="datascience">
+                        <div class="course-title">Data Science Professional Certificate</div>
+                        <div class="course-provider">IBM</div>
+                        <div class="course-meta">Beginner &bull; 100 hours &bull; 🏆 Certificate</div>
+                        <div class="course-description">Master data science skills and tools with hands-on projects.</div>
+                        <a class="course-link" href="https://www.coursera.org/professional-certificates/ibm-data-science" target="_blank">Go to Course</a>
+                    </div>
+                    <!-- Business -->
+                    <div class="course-card" data-category="business">
+                        <div class="course-title">Digital Marketing</div>
+                        <div class="course-provider">Google</div>
+                        <div class="course-meta">Beginner &bull; 40 hours &bull; 🏅 Badge</div>
+                        <div class="course-description">Master the basics of digital marketing with Google's free course and earn a badge.</div>
+                        <a class="course-link" href="https://learndigital.withgoogle.com/digitalgarage/course/digital-marketing" target="_blank">Go to Course</a>
+                    </div>
+                    <!-- Design -->
+                    <div class="course-card" data-category="design">
+                        <div class="course-title">Adobe Photoshop</div>
+                        <div class="course-provider">Mind Luster</div>
+                        <div class="course-meta">Beginner &bull; 1.4 hours &bull; 🏆 Certificate</div>
+                        <div class="course-description">Learn the basics of Adobe Photoshop and earn a certificate upon completion.</div>
+                        <a class="course-link" href="https://www.mindluster.com/certificate/1568/Adobe-Photoshop" target="_blank">Go to Course</a>
+                    </div>
+                    <!-- Cloud -->
+                    <div class="course-card" data-category="cloud">
+                        <div class="course-title">AWS Cloud Practitioner Essentials</div>
+                        <div class="course-provider">Amazon</div>
+                        <div class="course-meta">Beginner &bull; 6 hours &bull; 🏅 Badge</div>
+                        <div class="course-description">Learn the basics of AWS Cloud and cloud computing concepts.</div>
+                        <a class="course-link" href="https://www.aws.training/Details/Curriculum?id=20685" target="_blank">Go to Course</a>
+                    </div>
+                    <!-- DevOps -->
+                    <div class="course-card" data-category="devops">
+                        <div class="course-title">DevOps Essentials</div>
+                        <div class="course-provider">Linux Academy</div>
+                        <div class="course-meta">Beginner &bull; 10 hours &bull; 🏆 Certificate</div>
+                        <div class="course-description">Learn the basics of DevOps, CI/CD, and automation.</div>
+                        <a class="course-link" href="https://linuxacademy.com/course/devops-essentials/" target="_blank">Go to Course</a>
+                    </div>
+                    <!-- AI & ML -->
+                    <div class="course-card" data-category="ai">
+                        <div class="course-title">Machine Learning</div>
+                        <div class="course-provider">Coursera (Andrew Ng)</div>
+                        <div class="course-meta">Beginner &bull; 60 hours &bull; 🏆 Certificate</div>
+                        <div class="course-description">Learn the foundations of machine learning and AI from Andrew Ng.</div>
+                        <a class="course-link" href="https://www.coursera.org/learn/machine-learning" target="_blank">Go to Course</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chat Section -->
+        <section class="chat-section" id="chat">
+            <div class="chat-info">
+                <h2>Chat with NEXUS</h2>
+                <p>Get instant answers to your technical questions, code reviews, architecture advice, and personalized learning recommendations from our AI assistant.</p>
+                
+                <div class="chat-features">
+                    <div class="chat-feature">
+                        <div class="chat-feature-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="chat-feature-content">
+                            <h4>Code Assistance</h4>
+                            <p>Get help with debugging, optimization, and best practices.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-feature">
+                        <div class="chat-feature-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div class="chat-feature-content">
+                            <h4>Tech Recommendations</h4>
+                            <p>Receive personalized stack suggestions for your projects.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-feature">
+                        <div class="chat-feature-icon">
+                            <i class="fas fa-road"></i>
+                        </div>
+                        <div class="chat-feature-content">
+                            <h4>Learning Paths</h4>
+                            <p>Get customized roadmaps based on your skill level.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-feature">
+                        <div class="chat-feature-icon">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <div class="chat-feature-content">
+                            <h4>Architecture Advice</h4>
+                            <p>Plan your application structure with expert guidance.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <p>NEXUS understands context and can remember previous conversations to provide more relevant answers. Try asking about specific technologies, debugging help, or recommendations for your next project.</p>
+            </div>
+            
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="chat-header-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="chat-header-info">
+                        <h3>NEXUS Assistant</h3>
+                        <p>Online - Ready to help</p>
+                    </div>
+                </div>
+                
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message bot-message">
+                        <div class="message-avatar bot-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            Hello! I'm NEXUS, your tech stack assistant. How can I help you today? You can ask me about:
+                            <ul>
+                                <li>Technology recommendations</li>
+                                <li>Learning resources</li>
+                                <li>Code debugging</li>
+                                <li>Project architecture</li>
+                                <li>Career advice</li>
+                            </ul>
+                            <div class="message-time">Just now</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-input">
+                    <div class="chat-input-field">
+                        <input type="text" id="user-input" placeholder="Ask me anything about technology...">
+                        <div class="input-actions">
+                            <i class="fas fa-paperclip input-action"></i>
+                        </div>
+                    </div>
+                    <button id="send-button">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="faq-section" id="faq">
+            <div class="section-title">
+                <h2>Frequently Asked Questions</h2>
+                <!-- Subtitle removed -->
+                <div class="faq-underline"></div>
+            </div>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>What technologies does NEXUS support?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>NEXUS supports a wide range of technologies across frontend (HTML, CSS, JavaScript, React, Vue, etc.), backend (Node.js, Python, Java, .NET, etc.), databases (SQL, NoSQL), DevOps (Docker, Kubernetes, AWS), mobile development (React Native, Flutter), and data science (Python, R, ML frameworks). Our knowledge is constantly updated to include the latest technologies and best practices.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>How does NEXUS personalize recommendations?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>NEXUS personalizes recommendations based on several factors: your current skill level (which you can specify), the technologies you're already familiar with, your project requirements (performance needs, team size, budget), and your learning preferences (video tutorials, documentation, hands-on projects). The more you interact with NEXUS, the better it can tailor its advice.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Can NEXUS help with debugging specific code?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes! You can share your code snippets with NEXUS (either by pasting or uploading files) and it will analyze the code for errors, suggest improvements, explain potential issues, and provide corrected versions. NEXUS can help with syntax errors, logical bugs, performance issues, and security vulnerabilities across many programming languages.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>How accurate are NEXUS's recommendations?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>NEXUS's recommendations are based on industry best practices, current trends, and analysis of successful projects. While we strive for high accuracy, technology choices often depend on specific contexts. NEXUS will explain the reasoning behind recommendations so you can make informed decisions. We recommend cross-referencing with other sources for critical decisions.</p>
+                    </div>
+                </div>
+                <!-- Add more faq-item blocks as needed -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Contact Section -->
+    <section id="contact" style="padding: 4rem 0; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <h2 style="text-align: center; color: #fff; font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem;">Get in Touch</h2>
+            <p style="text-align: center; color: #94a3b8; max-width: 700px; margin: 0 auto 3rem auto; font-size: 1.1rem;">
+                Have questions or feedback? Send us a message and we'll get back to you as soon as possible.
+            </p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
+                <div>
+                    <h3 style="color: #4cc9f0; font-size: 1.8rem; margin-bottom: 1.5rem;">Send us a message</h3>
+                    <form id="contact-form" style="display: flex; flex-direction: column; gap: 1.2rem;">
+                        <div>
+                            <label for="contact-name" style="display: block; margin-bottom: 0.5rem; color: #cbd5e1; font-weight: 500;">Name</label>
+                            <input type="text" id="contact-name" name="name" style="width: 100%; padding: 0.75rem 1rem; border-radius: 12px; border: 1px solid #334155; background: #1e293b; color: #f8fafc; font-size: 1rem;" required>
+                        </div>
+                        <div>
+                            <label for="contact-email" style="display: block; margin-bottom: 0.5rem; color: #cbd5e1; font-weight: 500;">Email</label>
+                            <input type="email" id="contact-email" name="email" style="width: 100%; padding: 0.75rem 1rem; border-radius: 12px; border: 1px solid #334155; background: #1e293b; color: #f8fafc; font-size: 1rem;" required>
+                        </div>
+                        <div>
+                            <label for="contact-message" style="display: block; margin-bottom: 0.5rem; color: #cbd5e1; font-weight: 500;">Message</label>
+                            <textarea id="contact-message" name="message" rows="5" style="width: 100%; padding: 0.75rem 1rem; border-radius: 12px; border: 1px solid #334155; background: #1e293b; color: #f8fafc; font-size: 1rem; resize: vertical;" required></textarea>
+                        </div>
+                        <button type="submit" style="background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%); color: white; border: none; border-radius: 12px; padding: 0.85rem 1.5rem; font-weight: 600; font-size: 1rem; cursor: pointer; align-self: flex-start; transition: all 0.3s; box-shadow: 0 4px 20px rgba(67, 97, 238, 0.15);">
+                            Send Message
+                        </button>
+                    </form>
+                    <div id="contact-message-status" style="margin-top: 1rem; font-size: 0.95rem;"></div>
+                </div>
+                
+                <div style="background: #1e293b; padding: 2.5rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                    <h3 style="color: #4cc9f0; font-size: 1.8rem; margin-bottom: 1.5rem;">Contact Information</h3>
+                    
+                    <div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+                        <div style="width: 45px; height: 45px; background: rgba(76, 201, 240, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-envelope" style="color: #4cc9f0; font-size: 1.2rem;"></i>
+                        </div>
+                        <div>
+                            <h4 style="color: #e2e8f0; margin-bottom: 0.2rem; font-size: 1.1rem;">Email</h4>
+                            <p style="color: #94a3b8;">mohdaibad04@gmail.com</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+                        <div style="width: 45px; height: 45px; background: rgba(76, 201, 240, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-map-marker-alt" style="color: #4cc9f0; font-size: 1.2rem;"></i>
+                        </div>
+                        <div>
+                            <h4 style="color: #e2e8f0; margin-bottom: 0.2rem; font-size: 1.1rem;">Location</h4>
+                            <p style="color: #94a3b8;">Mumbai, India</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="width: 45px; height: 45px; background: rgba(76, 201, 240, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-globe" style="color: #4cc9f0; font-size: 1.2rem;"></i>
+                        </div>
+                        <div>
+                            <h4 style="color: #e2e8f0; margin-bottom: 0.2rem; font-size: 1.1rem;">Website</h4>
+                            <p style="color: #94a3b8;">www.nexusai.com</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+                        <a href="#" style="width: 45px; height: 45px; border-radius: 50%; background: rgba(76, 201, 240, 0.1); display: flex; align-items: center; justify-content: center; color: #4cc9f0; transition: all 0.3s;">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" style="width: 45px; height: 45px; border-radius: 50%; background: rgba(76, 201, 240, 0.1); display: flex; align-items: center; justify-content: center; color: #4cc9f0; transition: all 0.3s;">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" style="width: 45px; height: 45px; border-radius: 50%; background: rgba(76, 201, 240, 0.1); display: flex; align-items: center; justify-content: center; color: #4cc9f0; transition: all 0.3s;">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" style="width: 45px; height: 45px; border-radius: 50%; background: rgba(76, 201, 240, 0.1); display: flex; align-items: center; justify-content: center; color: #4cc9f0; transition: all 0.3s;">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-col">
+                <div class="footer-logo">
+                    <div class="footer-logo-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <span class="footer-logo-text">NEXUS</span>
+                </div>
+                <p class="footer-description">Your professional tech stack assistant helping developers navigate complex technology ecosystems with personalized guidance.</p>
+                <div class="footer-social">
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-discord"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-col">
+                <h4 class="footer-heading">Product</h4>
+                <ul class="footer-links">
+                    <li class="footer-link"><a href="#features">Features</a></li>
+                    <li class="footer-link"><a href="#roadmaps">Roadmaps</a></li>
+                    <li class="footer-link"><a href="#chat">Chat Assistant</a></li>
+                    <li class="footer-link"><a href="#">Pricing</a></li>
+                    <li class="footer-link"><a href="#">Updates</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4 class="footer-heading">Resources</h4>
+                <ul class="footer-links">
+                    <li class="footer-link"><a href="#">Documentation</a></li>
+                    <li class="footer-link"><a href="#">Blog</a></li>
+                    <li class="footer-link"><a href="#">Tutorials</a></li>
+                    <li class="footer-link"><a href="#">Community</a></li>
+                    <li class="footer-link"><a href="#">Support</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4 class="footer-heading">Company</h4>
+                <ul class="footer-links">
+                    <li class="footer-link"><a href="#">About Us</a></li>
+                    <li class="footer-link"><a href="#">Careers</a></li>
+                    <li class="footer-link"><a href="#">Contact</a></li>
+                    <li class="footer-link"><a href="#">Privacy Policy</a></li>
+                    <li class="footer-link"><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4 class="footer-heading">Newsletter</h4>
+                <p class="footer-description">Subscribe to get updates on new features, learning resources, and tech insights.</p>
+                <form class="newsletter-form" id="newsletter-form">
+                    <input type="email" id="newsletter-email" name="email" placeholder="Your email address" required>
+                    <button type="submit" class="newsletter-button">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+                <div id="newsletter-message" style="margin-top: 10px; font-size: 0.9rem;"></div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p class="copyright">© 2023 NEXUS. All rights reserved.</p>
+            <div class="footer-legal">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Cookies</a>
+            </div>
+        </div>
+    </footer>
+
+    <div style="text-align:center; margin: 2rem 0;">
+        <form action="{{ url_for('logout') }}" method="get" style="display:inline;">
+            <button type="submit"
+                style="background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+                       color: #fff; 
+                       padding: 0.75rem 2rem; 
+                       border-radius: 8px; 
+                       font-weight: 600; 
+                       border: none;
+                       box-shadow: 0 4px 24px rgba(0,0,0,0.1); 
+                       cursor: pointer;
+                       transition: background 0.2s, transform 0.2s;">
+                Logout
+            </button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const chatMessages = document.getElementById('chat-messages');
+            const userInput = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = themeToggle.querySelector('i');
+            
+            // Check for saved theme preference or prefer-color-scheme
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            // Initialize theme
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+            }
+            
+            // Theme toggle functionality
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                
+                // Update icon
+                if (newTheme === 'dark') {
+                    themeIcon.classList.replace('fa-moon', 'fa-sun');
+                } else {
+                    themeIcon.classList.replace('fa-sun', 'fa-moon');
+                }
+            });
+            
+            // Format timestamp
+            function formatTime() {
+                const now = new Date();
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes}`;
+            }
+            
+            // Function to add a message to the chat
+            function addMessage(text, isUser) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = isUser ? 'message user-message' : 'message bot-message';
+                messageDiv.innerHTML = text;
+                
+                // Add timestamp
+                const timeSpan = document.createElement('span');
+                timeSpan.className = 'message-time';
+                timeSpan.textContent = formatTime();
+                messageDiv.appendChild(timeSpan);
+                
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Function to add a loading indicator
+            function addLoadingIndicator() {
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'typing-indicator';
+                typingDiv.id = 'typing-indicator';
+                
+                for (let i = 0; i < 3; i++) {
+                    const dot = document.createElement('span');
+                    typingDiv.appendChild(dot);
+                }
+                
+                chatMessages.appendChild(typingDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Function to remove loading indicator
+            function removeLoadingIndicator() {
+                const typingIndicator = document.getElementById('typing-indicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+            }
+            
+            // Function to handle sending a message to Flask backend
+            async function sendMessage() {
+                const userMessage = userInput.value.trim();
+                if (userMessage === '') return;
+                
+                // Disable input and button while processing
+                userInput.disabled = true;
+                sendButton.disabled = true;
+                
+                // Add user message to chat
+                addMessage(userMessage, true);
+                userInput.value = '';
+                
+                // Add loading indicator
+                addLoadingIndicator();
+                
+                try {
+                    // Send message to Flask backend
+                    const response = await fetch('/query', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ query: userMessage })
+                    });
+                    
+                    // Remove loading indicator
+                    removeLoadingIndicator();
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        // Format the answer with line breaks if needed
+                        const formattedAnswer = data.answer.replace(/\n/g, '<br>');
+                        addMessage(formattedAnswer, false);
+                    } else {
+                        addMessage("Sorry, I encountered an error. Please try again.", false);
+                        console.error('Server error:', await response.text());
+                    }
+                } catch (error) {
+                    // Remove loading indicator
+                    removeLoadingIndicator();
+                    
+                    // Add error message
+                    addMessage("Network error. Please check your connection and try again.", false);
+                    console.error('Fetch error:', error);
+                } finally {
+                    // Re-enable input and button
+                    userInput.disabled = false;
+                    sendButton.disabled = false;
+                    userInput.focus();
+                }
+            }
+            
+            // Event listeners
+            sendButton.addEventListener('click', sendMessage);
+            userInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // Focus input on page load
+            userInput.focus();
+            
+            // Newsletter form submission
+            const newsletterForm = document.getElementById('newsletter-form');
+            const newsletterMessage = document.getElementById('newsletter-message');
+            
+            if (newsletterForm) {
+                newsletterForm.addEventListener('submit', async function(event) {
+                    event.preventDefault();
+                    
+                    const email = document.getElementById('newsletter-email').value.trim();
+                    if (!email) return;
+                    
+                    const submitButton = this.querySelector('button[type="submit"]');
+                    const originalContent = submitButton.innerHTML;
+                    
+                    // Show loading state
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    submitButton.disabled = true;
+                    
+                    try {
+                        const formData = new FormData();
+                        formData.append('email', email);
+                        
+                        const response = await fetch('/subscribe', {
+                            method: 'POST',
+                            body: formData,
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (response.ok) {
+                            newsletterMessage.textContent = 'Subscription successful! Thank you.';
+                            newsletterMessage.style.color = '#4cc9f0';
+                            newsletterForm.reset();
+                        } else {
+                            newsletterMessage.textContent = result.message || 'Subscription failed. Please try again.';
+                            newsletterMessage.style.color = '#f87171';
+                        }
+                    } catch (error) {
+                        console.error('Newsletter submission error:', error);
+                        newsletterMessage.textContent = 'Network error. Please try again later.';
+                        newsletterMessage.style.color = '#f87171';
+                    } finally {
+                        submitButton.innerHTML = originalContent;
+                        submitButton.disabled = false;
+                    }
+                });
+            }
+            
+            // Contact form submission
+            const contactForm = document.getElementById('contact-form');
+            const contactMessageStatus = document.getElementById('contact-message-status');
+            
+            if (contactForm) {
+                contactForm.addEventListener('submit', async function(event) {
+                    event.preventDefault();
+                    
+                    const name = document.getElementById('contact-name').value.trim();
+                    const email = document.getElementById('contact-email').value.trim();
+                    const message = document.getElementById('contact-message').value.trim();
+                    
+                    if (!name || !email || !message) return;
+                    
+                    const submitButton = this.querySelector('button[type="submit"]');
+                    const originalContent = submitButton.innerHTML;
+                    
+                    // Show loading state
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                    submitButton.disabled = true;
+                    
+                    try {
+                        const formData = new FormData();
+                        formData.append('name', name);
+                        formData.append('email', email);
+                        formData.append('message', message);
+                        
+                        const response = await fetch('/send-message', {
+                            method: 'POST',
+                            body: formData,
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (response.ok) {
+                            contactMessageStatus.textContent = 'Message sent successfully! We\'ll get back to you soon.';
+                            contactMessageStatus.style.color = '#4ade80';
+                            contactForm.reset();
+                        } else {
+                            contactMessageStatus.textContent = result.message || 'Failed to send message. Please try again.';
+                            contactMessageStatus.style.color = '#f87171';
+                        }
+                    } catch (error) {
+                        console.error('Contact form submission error:', error);
+                        contactMessageStatus.textContent = 'Network error. Please try again later.';
+                        contactMessageStatus.style.color = '#f87171';
+                    } finally {
+                        submitButton.innerHTML = 'Send Message';
+                        submitButton.disabled = false;
+                    }
+                });
+            }
+            
+            // Interactive Hero Background
+            const hero = document.getElementById('hero');
+            const heroContent = hero.querySelector('.hero-content');
+            const heroParticles = document.getElementById('particles');
+            const heroPattern = document.querySelector('.hero-pattern');
+            const heroGrid = document.querySelector('.hero-grid');
+            const glowEffect = document.getElementById('glow-effect');
+            
+            // Create particles
+            function createParticles() {
+                // Clear existing particles
+                heroParticles.innerHTML = '';
+                
+                // Number of particles based on screen size
+                const particleCount = window.innerWidth < 768 ? 30 : 60;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    // Random position
+                    const x = Math.random() * 100;
+                    const y = Math.random() * 100;
+                    
+                    // Random size
+                    const size = Math.random() * 6 + 4;
+                    
+                    // Random animation duration
+                    const duration = Math.random() * 20 + 10;
+                    
+                    // Random delay
+                    const delay = Math.random() * 10;
+                    
+                    // Random depth (z-index)
+                    const depth = Math.floor(Math.random() * 50);
+                    
+                    // Apply styles
+                    particle.style.left = `${x}%`;
+                    particle.style.top = `${y}%`;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.animationDuration = `${duration}s`;
+                    particle.style.animationDelay = `${delay}s`;
+                    particle.style.transform = `translateZ(${depth}px)`;
+                    
+                    // Add glow effect to some particles
+                    if (Math.random() > 0.7) {
+                        particle.classList.add('glow');
+                    }
+                    
+                    heroParticles.appendChild(particle);
+                }
+            }
+            
+            // 3D effect on mouse move
+            function addMouseMoveEffect() {
+                hero.addEventListener('mousemove', (e) => {
+                    // Calculate mouse position relative to the center of the hero section
+                    const rect = hero.getBoundingClientRect();
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const mouseX = e.clientX - rect.left;
+                    const mouseY = e.clientY - rect.top;
+                    
+                    // Calculate the offset from center (normalized to -1 to 1)
+                    const offsetX = (mouseX - centerX) / centerX;
+                    const offsetY = (mouseY - centerY) / centerY;
+                    
+                    // Apply 3D rotation effect to hero content
+                    heroContent.style.transform = `
+                        translateZ(30px)
+                        rotateX(${offsetY * -3}deg)
+                        rotateY(${offsetX * 3}deg)
+                    `;
+                    
+                    // Move pattern and grid based on mouse position for parallax effect
+                    heroPattern.style.transform = `
+                        translateX(${offsetX * -15}px)
+                        translateY(${offsetY * -15}px)
+                        translateZ(20px)
+                    `;
+                    
+                    heroGrid.style.transform = `
+                        translateX(${offsetX * -10}px)
+                        translateY(${offsetY * -10}px)
+                        translateZ(10px)
+                    `;
+                    
+                    // Show and position the glow effect
+                    glowEffect.style.opacity = '1';
+                    glowEffect.style.left = `${mouseX}px`;
+                    glowEffect.style.top = `${mouseY}px`;
+                });
+                
+                // Reset transforms when mouse leaves
+                hero.addEventListener('mouseleave', () => {
+                    heroContent.style.transform = 'translateZ(30px) rotateX(0deg) rotateY(0deg)';
+                    heroPattern.style.transform = 'translateZ(20px)';
+                    heroGrid.style.transform = 'translateZ(10px)';
+                    glowEffect.style.opacity = '0';
+                });
+            }
+            
+            // Scroll parallax effect
+            function addScrollEffect() {
+                window.addEventListener('scroll', () => {
+                    const scrollTop = window.scrollY;
+                    const heroHeight = hero.offsetHeight;
+                    const scrollPercentage = Math.min(scrollTop / heroHeight, 1);
+                    
+                    // Move elements based on scroll position
+                    heroContent.style.transform = `translateY(${scrollPercentage * 100}px) translateZ(30px)`;
+                    heroPattern.style.transform = `translateY(${scrollPercentage * 50}px) translateZ(20px)`;
+                    heroGrid.style.transform = `translateY(${scrollPercentage * 25}px) translateZ(10px)`;
+                    
+                    // Fade out elements as user scrolls
+                    hero.style.opacity = 1 - scrollPercentage * 0.5;
+                });
+            }
+            
+            // Initialize hero effects
+            function initHeroEffects() {
+                createParticles();
+                addMouseMoveEffect();
+                addScrollEffect();
+                initWebGLBackground();
+                
+                // Recreate particles when window is resized
+                window.addEventListener('resize', createParticles);
+                window.addEventListener('resize', resizeWebGLBackground);
+            }
+            
+            // WebGL background effect
+            let scene, camera, renderer, clock, uniforms;
+            
+            function initWebGLBackground() {
+                const canvas = document.getElementById('webgl-canvas');
+                if (!canvas) return;
+                
+                // Initialize Three.js scene
+                scene = new THREE.Scene();
+                camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+                
+                // Create renderer
+                renderer = new THREE.WebGLRenderer({ 
+                    canvas: canvas,
+                    antialias: true,
+                    alpha: true
+                });
+                
+                // Set renderer size
+                resizeWebGLBackground();
+                
+                // Initialize clock for animation
+                clock = new THREE.Clock();
+                
+                // Create shader material
+                uniforms = {
+                    u_time: { value: 0.0 },
+                    u_resolution: { value: new THREE.Vector2() },
+                    u_mouse: { value: new THREE.Vector2() }
+                };
+                
+                const shaderMaterial = new THREE.ShaderMaterial({
+                    uniforms: uniforms,
+                    vertexShader: `
+                        void main() {
+                            gl_Position = vec4(position, 1.0);
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform float u_time;
+                        uniform vec2 u_resolution;
+                        uniform vec2 u_mouse;
+                        
+                        #define PI 3.14159265359
+                        
+                        // Function to create a color gradient
+                        vec3 colorGradient(float t) {
+                            vec3 a = vec3(0.1, 0.19, 0.89); // Dark blue
+                            vec3 b = vec3(0.3, 0.39, 0.99); // Medium blue
+                            vec3 c = vec3(0.4, 0.6, 1.0);   // Light blue
+                            vec3 d = vec3(0.29, 0.36, 0.9); // Royal blue
+                            
+                            float step1 = smoothstep(0.0, 0.33, t);
+                            float step2 = smoothstep(0.33, 0.66, t);
+                            float step3 = smoothstep(0.66, 1.0, t);
+                            
+                            vec3 color = mix(a, b, step1);
+                            color = mix(color, c, step2);
+                            color = mix(color, d, step3);
+                            
+                            return color;
+                        }
+                        
+                        // Noise functions
+                        float random(vec2 st) {
+                            return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+                        }
+                        
+                        float noise(vec2 st) {
+                            vec2 i = floor(st);
+                            vec2 f = fract(st);
+                            
+                            // Four corners
+                            float a = random(i);
+                            float b = random(i + vec2(1.0, 0.0));
+                            float c = random(i + vec2(0.0, 1.0));
+                            float d = random(i + vec2(1.0, 1.0));
+                            
+                            // Smooth interpolation
+                            vec2 u = f * f * (3.0 - 2.0 * f);
+                            
+                            return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+                        }
+                        
+                        float fbm(vec2 st) {
+                            float value = 0.0;
+                            float amplitude = 0.5;
+                            float frequency = 0.0;
+                            
+                            // Octaves
+                            for (int i = 0; i < 6; i++) {
+                                value += amplitude * noise(st);
+                                st *= 2.0;
+                                amplitude *= 0.5;
+                            }
+                            
+                            return value;
+                        }
+                        
+                        void main() {
+                            // Normalized coordinates
+                            vec2 st = gl_FragCoord.xy / u_resolution.xy;
+                            st.x *= u_resolution.x / u_resolution.y;
+                            
+                            // Mouse influence
+                            vec2 mouse = u_mouse / u_resolution;
+                            float mouseInfluence = distance(st, mouse) * 2.0;
+                            
+                            // Create flowing effect
+                            float time = u_time * 0.2;
+                            vec2 q = vec2(0.0);
+                            q.x = fbm(st + 0.1 * time);
+                            q.y = fbm(st + vec2(1.0));
+                            
+                            vec2 r = vec2(0.0);
+                            r.x = fbm(st + 1.0 * q + vec2(1.7, 9.2) + 0.15 * time);
+                            r.y = fbm(st + 1.0 * q + vec2(8.3, 2.8) + 0.16 * time);
+                            
+                            // Final noise value
+                            float f = fbm(st + r);
+                            
+                            // Add mouse influence to create interactive effect
+                            f = mix(f, f * (1.0 - mouseInfluence * 0.5), 0.5);
+                            
+                            // Create color with gradient
+                            vec3 color = colorGradient(f);
+                            
+                            // Add some brightness variation
+                            color += 0.1 * sin(time * 2.0);
+                            
+                            // Output color
+                            gl_FragColor = vec4(color, 0.85);
+                        }
+                    `
+                });
+                
+                // Create a plane that fills the screen
+                const geometry = new THREE.PlaneGeometry(2, 2);
+                const mesh = new THREE.Mesh(geometry, shaderMaterial);
+                scene.add(mesh);
+                
+                // Add mouse move tracking for shader
+                document.addEventListener('mousemove', (event) => {
+                    uniforms.u_mouse.value.x = event.clientX;
+                    uniforms.u_mouse.value.y = window.innerHeight - event.clientY;
+                });
+                
+                // Start animation loop
+                animate();
+            }
+            
+            function resizeWebGLBackground() {
+                if (!renderer) return;
+                
+                const canvas = renderer.domElement;
+                const width = canvas.clientWidth;
+                const height = canvas.clientHeight;
+                
+                if (canvas.width !== width || canvas.height !== height) {
+                    renderer.setSize(width, height, false);
+                    uniforms.u_resolution.value.x = width;
+                    uniforms.u_resolution.value.y = height;
+                }
+            }
+            
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                if (uniforms) {
+                    uniforms.u_time.value = clock.getElapsedTime();
+                }
+                
+                renderer.render(scene, camera);
+            }
+            
+            // Initialize all effects
+            initHeroEffects();
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+          const filterButtons = document.querySelectorAll('.filter-btn');
+          const courseCards = document.querySelectorAll('.course-card');
+
+          filterButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+              // Remove active from all
+              filterButtons.forEach(b => b.classList.remove('active'));
+              this.classList.add('active');
+              const category = this.getAttribute('data-category');
+              courseCards.forEach(card => {
+                if (category === 'all' || card.getAttribute('data-category') === category) {
+                  card.style.display = '';
+                } else {
+                  card.style.display = 'none';
+                }
+              });
+            });
+          });
+        });
+
+        document.querySelectorAll('.faq-question').forEach(q => {
+          q.addEventListener('click', function() {
+            const item = this.parentElement;
+            // Close others
+            document.querySelectorAll('.faq-item').forEach(i => {
+              if (i !== item) i.classList.remove('active');
+            });
+            // Toggle this one
+            item.classList.toggle('active');
+          });
+        });
+
+        document.querySelectorAll('.roadmap-tab').forEach(tab => {
+          tab.addEventListener('click', function() {
+            // Remove active from all tabs and contents
+            document.querySelectorAll('.roadmap-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.roadmap-content').forEach(c => c.classList.remove('active'));
+            // Activate this tab and its content
+            this.classList.add('active');
+            document.querySelector('.roadmap-content[data-tab="' + this.getAttribute('data-tab') + '"]').classList.add('active');
+          });
+        });
+    </script>
+</body>
+</html>
