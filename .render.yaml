@@ -3,6 +3,7 @@ services:
     name: nexus-chatbot
     env: docker
     plan: free
+    healthCheckPath: /
     envVars:
       - key: PINECONE_API_KEY
         sync: false
@@ -10,3 +11,13 @@ services:
         value: production
       - key: SECRET_KEY
         sync: false
+      - key: WEB_CONCURRENCY
+        value: "1"
+      - key: MAX_WORKERS
+        value: "1"
+      - key: PYTHON_GC_AGGRESSIVE 
+        value: "1"
+    scaling:
+      minInstances: 1
+      maxInstances: 1
+      targetMemoryPercent: 80

@@ -1,4 +1,8 @@
-# Add these to .dockerignore
+# Git
+.git
+.gitignore
+
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -19,9 +23,31 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
 .env
-.git
-.gitignore
-.idea
-.vscode
-node_modules
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Large files that shouldn't be in Docker context
+*.zip
+*.tar
+*.gz
+*.log
+*.tmp
+
+# Local development files
+*.sqlite3
+*.db
+node_modules/

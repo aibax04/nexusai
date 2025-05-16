@@ -28,19 +28,39 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
+# Set environment variables for runtime
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+# Memory optimization settings
+ENV MALLOC_TRIM_THRESHOLD_=100000
+# Limit Python memory usage
+ENV PYTHONMALLOC=malloc
+# Disable JIT for memory savings
+ENV NUMBA_DISABLE_JIT=1
+
 # Copy virtual environment from builder stage
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
+# Install additional utilities
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    procps \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy only necessary application files
 COPY app.py .
 COPY templates/ templates/
+COPY start.sh .
+RUN chmod +x start.sh
 
 # Expose port
 EXPOSE 8080
 
-# Note: Environment variables like PINECONE_API_KEY need to be provided at runtime
-# Command to run the application with proper signal handling and optimized settings
-CMD gunicorn --bind 0.0.0.0:${PORT:-8080} --workers 1 --timeout 120 app:app
+# Pre-download models to avoid memory spikes during first request
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
+
+# Command to run the app with our start script
+CMD ["./start.sh"]
 
 

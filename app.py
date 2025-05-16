@@ -8,6 +8,23 @@ from dotenv import load_dotenv
 from flask_cors import CORS
 import smtplib
 from email.message import EmailMessage
+import gc
+import sys
+import logging
+
+# Memory optimization
+def optimize_memory():
+    gc.collect()
+    if hasattr(torch, 'cuda'):
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+    logging.info(f"Memory optimization performed: {sys.getsizeof(gc.get_objects()) / (1024 * 1024):.2f}MB")
+
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 
 # Load environment variables
 load_dotenv()
@@ -99,14 +116,16 @@ def query():
     try:
         data = request.get_json()
         user_question = data.get("query", "")
-        print("Received:", user_question)
+        logging.info(f"Received query: {user_question[:50]}...")
 
         # Lazy load embedding model
         if embedding_model is None:
+            logging.info("Loading embedding model...")
             embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
         # Lazy load Pinecone
         if pinecone_index is None:
+            logging.info("Initializing Pinecone...")
             pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
             pinecone_index = pc.Index("leo")
 
@@ -117,16 +136,22 @@ def query():
         results = pinecone_index.query(vector=query_embedding, top_k=3, include_metadata=True)
         matches = results.get("matches", [])
 
+        # Run memory optimization
+        optimize_memory()
+
         if not matches:
             return jsonify({"answer": "❌ Sorry, I couldn't find any relevant information."})
 
         answer = matches[0]["metadata"].get("text", "⚠️ No data found.")
-        print("Bot response:", answer)
+        logging.info("Query processed successfully")
         return jsonify({"answer": answer})
 
     except Exception as e:
-        print("Error in /query:", str(e))
+        logging.error(f"Error in /query: {str(e)}")
         return jsonify({"answer": f"⚠️ Internal error: {str(e)}"}), 500
+    finally:
+        # Force garbage collection
+        optimize_memory()
 
 @app.route('/courses')
 @login_required
