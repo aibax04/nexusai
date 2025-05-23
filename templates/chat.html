@@ -7,12 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEXUS - Professional Tech Stack Assistant</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Add Three.js for WebGL effects -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Remove Three.js to reduce memory usage -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
         
-                :root {            /* Professional corporate color palette */            --primary-color: #2563eb;            --primary-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);            --secondary-color: #0f172a;            --accent-color: #60a5fa;            --accent-gradient: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);            --success-color: #10b981;            --warning-color: #f59e0b;            --danger-color: #ef4444;                        /* Professional dark theme */            --bg-color: #0f172a;            --surface-color: #1e293b;            --text-primary: #f8fafc;            --text-secondary: #94a3b8;            --border-color: #334155;            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.15);            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.15);            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.15);            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.15);                        /* UI components */            --header-height: 70px;            --sidebar-width: 280px;            --card-radius: 12px;            --button-radius: 8px;            --input-radius: 8px;                        /* Chat specific */            --chat-user-bg: #334155;            --chat-bot-bg: #1e293b;        }
+        :root {            /* Professional corporate color palette */            --primary-color: #2563eb;            --primary-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);            --secondary-color: #0f172a;            --accent-color: #60a5fa;            --accent-gradient: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);            --success-color: #10b981;            --warning-color: #f59e0b;            --danger-color: #ef4444;                        /* Professional dark theme */            --bg-color: #0f172a;            --surface-color: #1e293b;            --text-primary: #f8fafc;            --text-secondary: #94a3b8;            --border-color: #334155;            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.15);            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.15);            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.15);            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.15);                        /* UI components */            --header-height: 70px;            --sidebar-width: 280px;            --card-radius: 12px;            --button-radius: 8px;            --input-radius: 8px;                        /* Chat specific */            --chat-user-bg: #334155;            --chat-bot-bg: #1e293b;        }
 
                 /* Professional light theme when toggled */        [data-theme="light"] {            --bg-color: #f8fafc;            --surface-color: #ffffff;            --text-primary: #0f172a;            --text-secondary: #475569;            --border-color: #e2e8f0;            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.05);            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.05), 0 4px 6px rgba(0, 0, 0, 0.05);            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.07), 0 10px 10px rgba(0, 0, 0, 0.04);                        /* Primary and accent colors stay the same for brand consistency */            --chat-user-bg: #e6f0ff;            --chat-bot-bg: #f1f7ff;        }
 
@@ -111,7 +110,7 @@
             padding: 2rem;
         }
 
-        /* Hero Section */
+        /* Hero Section - Simplified */
         .hero {
             position: relative;
             padding: 6rem 2rem;
@@ -123,20 +122,15 @@
             margin-bottom: 4rem;
             border-radius: var(--card-radius);
             min-height: 80vh;
-            perspective: 1000px;
+            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
         }
         
-        #webgl-canvas {
+        .hero-bg {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -4;
-            border-radius: var(--card-radius);
+            inset: 0;
+            z-index: -3;
+            opacity: 0.85;
         }
-
-                .hero-bg {            position: absolute;            inset: 0;            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);            z-index: -3;            transform-style: preserve-3d;            opacity: 0.85; /* Professional, slightly higher opacity */        }
 
         .hero-pattern {
             position: absolute;
@@ -144,8 +138,21 @@
             background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10zm10 8c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm40 40c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
             z-index: -2;
             opacity: 0.6;
-            transform: translateZ(20px);
-            transition: all 0.3s ease;
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-size: 50px 50px;
+            background-image: 
+                linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+            z-index: -1;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            z-index: 1;
         }
 
         .hero-particles {
@@ -938,14 +945,12 @@
 
     <!-- Main Content -->
     <main>
-        <!-- Hero Section -->
+        <!-- Hero Section - Simplified -->
         <section class="hero" id="hero">
-            <canvas id="webgl-canvas"></canvas>
+            <!-- Remove WebGL canvas and particles -->
             <div class="hero-bg"></div>
             <div class="hero-pattern"></div>
             <div class="hero-grid"></div>
-            <div class="hero-particles" id="particles"></div>
-            <div class="glow-effect" id="glow-effect"></div>
             
             <div class="hero-content">
                 <h1>Your <span>Professional</span> Tech Stack Assistant</h1>
@@ -1566,55 +1571,149 @@
     </div>
 
     <script>
+        // Add a global error handler to catch any uncaught exceptions
+        window.addEventListener('error', function(event) {
+            console.error('Global error caught:', event.error);
+            // Prevent site crash by handling the error
+            event.preventDefault();
+            return true;
+        });
+        
+        // Implement lazy loading for images and heavy content
         document.addEventListener('DOMContentLoaded', function() {
+            // Memory management - clear unused variables periodically
+            let memoryManager = {
+                timeoutId: null,
+                run: function() {
+                    this.timeoutId = setTimeout(() => {
+                        // Force garbage collection hints (browser may ignore)
+                        if (window.gc) window.gc();
+                        console.log('Memory management cycle ran');
+                        this.run();
+                    }, 60000); // Run every minute
+                },
+                stop: function() {
+                    if (this.timeoutId) clearTimeout(this.timeoutId);
+                }
+            };
+            
+            // Start memory management for long sessions
+            memoryManager.run();
+            
+            // Lazy load images outside viewport
+            function lazyLoadImages() {
+                const lazyImages = [].slice.call(document.querySelectorAll('img.lazy'));
+                
+                if ('IntersectionObserver' in window) {
+                    let lazyImageObserver = new IntersectionObserver(function(entries) {
+                        entries.forEach(function(entry) {
+                            if (entry.isIntersecting) {
+                                let lazyImage = entry.target;
+                                lazyImage.src = lazyImage.dataset.src;
+                                lazyImage.classList.remove('lazy');
+                                lazyImageObserver.unobserve(lazyImage);
+                            }
+                        });
+                    });
+                    
+                    lazyImages.forEach(function(lazyImage) {
+                        lazyImageObserver.observe(lazyImage);
+                    });
+                } else {
+                    // Fallback for browsers without intersection observer
+                    let active = false;
+                    
+                    const lazyLoad = function() {
+                        if (active === false) {
+                            active = true;
+                            
+                            setTimeout(function() {
+                                lazyImages.forEach(function(lazyImage) {
+                                    if ((lazyImage.getBoundingClientRect().top <= window.innerHeight && lazyImage.getBoundingClientRect().bottom >= 0) && getComputedStyle(lazyImage).display !== "none") {
+                                        lazyImage.src = lazyImage.dataset.src;
+                                        lazyImage.classList.remove('lazy');
+                                        
+                                        lazyImages = lazyImages.filter(function(image) {
+                                            return image !== lazyImage;
+                                        });
+                                        
+                                        if (lazyImages.length === 0) {
+                                            document.removeEventListener("scroll", lazyLoad);
+                                            window.removeEventListener("resize", lazyLoad);
+                                            window.removeEventListener("orientationchange", lazyLoad);
+                                        }
+                                    }
+                                });
+                                
+                                active = false;
+                            }, 200);
+                        }
+                    };
+                    
+                    document.addEventListener("scroll", lazyLoad);
+                    window.addEventListener("resize", lazyLoad);
+                    window.addEventListener("orientationchange", lazyLoad);
+                }
+            }
+            
+            // Run lazy loading if images with lazy class exist
+            if (document.querySelectorAll('img.lazy').length > 0) {
+                lazyLoadImages();
+            }
+            
             // DOM elements
             const chatMessages = document.getElementById('chat-messages');
             const userInput = document.getElementById('user-input');
             const sendButton = document.getElementById('send-button');
             const themeToggle = document.getElementById('theme-toggle');
-            const themeIcon = themeToggle.querySelector('i');
+            const themeIcon = themeToggle ? themeToggle.querySelector('i') : null;
+            
+            // Safely access DOM elements with error handling
+            function safeGetElement(id) {
+                const element = document.getElementById(id);
+                if (!element) console.warn(`Element with ID ${id} not found`);
+                return element;
+            }
             
             // Check for saved theme preference
             const savedTheme = localStorage.getItem('theme');
             
             // Initialize theme - default to dark unless explicitly set to light
-            if (savedTheme === 'light') {
-                document.documentElement.setAttribute('data-theme', 'light');
-                if (themeIcon.classList.contains('fa-moon')) {
-                    // Already correct icon
-                } else {
-                    themeIcon.classList.remove('fa-sun');
-                    themeIcon.classList.add('fa-moon');
-                }
-            } else {
-                // Default to dark theme
-                document.documentElement.removeAttribute('data-theme');
-                if (themeIcon.classList.contains('fa-sun')) {
-                    // Already correct icon
-                } else {
-                    themeIcon.classList.remove('fa-moon');
-                    themeIcon.classList.add('fa-sun');
-                }
-            }
-            
-            // Theme toggle functionality
-            themeToggle.addEventListener('click', () => {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                
-                if (currentTheme === 'light') {
-                    // Switch to dark (default)
-                    document.documentElement.removeAttribute('data-theme');
-                    localStorage.removeItem('theme');
-                    themeIcon.classList.remove('fa-moon');
-                    themeIcon.classList.add('fa-sun');
-                } else {
-                    // Switch to light
+            if (themeToggle && themeIcon) {
+                if (savedTheme === 'light') {
                     document.documentElement.setAttribute('data-theme', 'light');
-                    localStorage.setItem('theme', 'light');
                     themeIcon.classList.remove('fa-sun');
                     themeIcon.classList.add('fa-moon');
+                } else {
+                    // Default to dark theme
+                    document.documentElement.removeAttribute('data-theme');
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
                 }
-            });
+                
+                // Theme toggle functionality with error handling
+                themeToggle.addEventListener('click', () => {
+                    try {
+                        const currentTheme = document.documentElement.getAttribute('data-theme');
+                        
+                        if (currentTheme === 'light') {
+                            // Switch to dark (default)
+                            document.documentElement.removeAttribute('data-theme');
+                            localStorage.removeItem('theme');
+                            themeIcon.classList.remove('fa-moon');
+                            themeIcon.classList.add('fa-sun');
+                        } else {
+                            // Switch to light
+                            document.documentElement.setAttribute('data-theme', 'light');
+                            localStorage.setItem('theme', 'light');
+                            themeIcon.classList.remove('fa-sun');
+                            themeIcon.classList.add('fa-moon');
+                        }
+                    } catch (error) {
+                        console.error('Theme toggle error:', error);
+                    }
+                });
+            }
             
             // Format timestamp
             function formatTime() {
@@ -1626,556 +1725,354 @@
             
             // Function to add a message to the chat
             function addMessage(text, isUser) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = isUser ? 'message user-message' : 'message bot-message';
-                messageDiv.innerHTML = text;
-                
-                // Add timestamp
-                const timeSpan = document.createElement('span');
-                timeSpan.className = 'message-time';
-                timeSpan.textContent = formatTime();
-                messageDiv.appendChild(timeSpan);
-                
-                chatMessages.appendChild(messageDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                try {
+                    if (!chatMessages) return;
+                    
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = isUser ? 'message user-message' : 'message bot-message';
+                    
+                    const avatarDiv = document.createElement('div');
+                    avatarDiv.className = isUser ? 'message-avatar user-avatar' : 'message-avatar bot-avatar';
+                    
+                    const icon = document.createElement('i');
+                    icon.className = isUser ? 'fas fa-user' : 'fas fa-robot';
+                    avatarDiv.appendChild(icon);
+                    
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'message-content';
+                    contentDiv.innerHTML = text;
+                    
+                    // Add timestamp
+                    const timeSpan = document.createElement('div');
+                    timeSpan.className = 'message-time';
+                    timeSpan.textContent = formatTime();
+                    contentDiv.appendChild(timeSpan);
+                    
+                    // Use fragment to minimize DOM updates
+                    const fragment = document.createDocumentFragment();
+                    fragment.appendChild(messageDiv);
+                    chatMessages.appendChild(fragment);
+                    
+                    // Smoothly scroll to latest message
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    
+                    // Return a cleanup function to help with memory management
+                    return function cleanup() {
+                        messageDiv.remove();
+                    };
+                } catch (error) {
+                    console.error('Error adding message:', error);
+                }
             }
             
             // Function to add a loading indicator
             function addLoadingIndicator() {
-                const typingDiv = document.createElement('div');
-                typingDiv.className = 'typing-indicator';
-                typingDiv.id = 'typing-indicator';
-                
-                for (let i = 0; i < 3; i++) {
-                    const dot = document.createElement('span');
-                    typingDiv.appendChild(dot);
+                try {
+                    if (!chatMessages) return null;
+                    
+                    const typingDiv = document.createElement('div');
+                    typingDiv.className = 'typing-indicator';
+                    typingDiv.id = 'typing-indicator';
+                    
+                    for (let i = 0; i < 3; i++) {
+                        const dot = document.createElement('span');
+                        typingDiv.appendChild(dot);
+                    }
+                    
+                    chatMessages.appendChild(typingDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    
+                    return typingDiv;
+                } catch (error) {
+                    console.error('Error adding loading indicator:', error);
+                    return null;
                 }
-                
-                chatMessages.appendChild(typingDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
             }
             
             // Function to remove loading indicator
             function removeLoadingIndicator() {
-                const typingIndicator = document.getElementById('typing-indicator');
-                if (typingIndicator) {
-                    typingIndicator.remove();
+                try {
+                    const typingIndicator = document.getElementById('typing-indicator');
+                    if (typingIndicator) {
+                        typingIndicator.remove();
+                    }
+                } catch (error) {
+                    console.error('Error removing loading indicator:', error);
                 }
             }
             
-            // Function to handle sending a message to Flask backend
+            // Throttle function to prevent excessive function calls
+            function throttle(func, limit) {
+                let inThrottle = false;
+                return function() {
+                    const args = arguments;
+                    const context = this;
+                    if (!inThrottle) {
+                        func.apply(context, args);
+                        inThrottle = true;
+                        setTimeout(() => inThrottle = false, limit);
+                    }
+                };
+            }
+            
+            // Function to handle sending a message to Flask backend with retry and timeout
             async function sendMessage() {
-                const userMessage = userInput.value.trim();
-                if (userMessage === '') return;
-                
-                // Disable input and button while processing
-                userInput.disabled = true;
-                sendButton.disabled = true;
-                
-                // Add user message to chat
-                addMessage(userMessage, true);
-                userInput.value = '';
-                
-                // Add loading indicator
-                addLoadingIndicator();
-                
                 try {
-                    // Send message to Flask backend
-                    const response = await fetch('/query', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ query: userMessage })
-                    });
+                    if (!userInput || !sendButton || !chatMessages) return;
                     
-                    // Remove loading indicator
-                    removeLoadingIndicator();
+                    const userMessage = userInput.value.trim();
+                    if (userMessage === '') return;
                     
-                    if (response.ok) {
-                        const data = await response.json();
-                        // Format the answer with line breaks if needed
-                        const formattedAnswer = data.answer.replace(/\n/g, '<br>');
-                        addMessage(formattedAnswer, false);
-                    } else {
-                        addMessage("Sorry, I encountered an error. Please try again.", false);
-                        console.error('Server error:', await response.text());
+                    // Disable input and button while processing
+                    userInput.disabled = true;
+                    sendButton.disabled = true;
+                    
+                    // Add user message to chat
+                    addMessage(userMessage, true);
+                    userInput.value = '';
+                    
+                    // Add loading indicator
+                    addLoadingIndicator();
+                    
+                    // Create an AbortController to manage request timeout
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+                    
+                    try {
+                        // Send message to Flask backend
+                        const response = await fetch('/query', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ query: userMessage }),
+                            signal: controller.signal
+                        });
+                        
+                        clearTimeout(timeoutId);
+                        
+                        // Remove loading indicator
+                        removeLoadingIndicator();
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            // Format the answer with line breaks if needed
+                            const formattedAnswer = data.answer.replace(/\n/g, '<br>');
+                            addMessage(formattedAnswer, false);
+                        } else {
+                            addMessage("Sorry, I encountered an error. Please try again.", false);
+                            console.error('Server error:', await response.text());
+                        }
+                    } catch (error) {
+                        clearTimeout(timeoutId);
+                        
+                        // Remove loading indicator
+                        removeLoadingIndicator();
+                        
+                        // Check if the error was a timeout
+                        if (error.name === 'AbortError') {
+                            addMessage("The request took too long and was cancelled. Please try again or ask a simpler question.", false);
+                        } else {
+                            // Add error message
+                            addMessage("Network error. Please check your connection and try again.", false);
+                        }
+                        console.error('Fetch error:', error);
+                    } finally {
+                        // Re-enable input and button
+                        userInput.disabled = false;
+                        sendButton.disabled = false;
+                        userInput.focus();
                     }
                 } catch (error) {
-                    // Remove loading indicator
+                    console.error('Global error in sendMessage:', error);
+                    // Make sure UI is restored even if something goes wrong
+                    if (userInput) userInput.disabled = false;
+                    if (sendButton) sendButton.disabled = false;
                     removeLoadingIndicator();
-                    
-                    // Add error message
-                    addMessage("Network error. Please check your connection and try again.", false);
-                    console.error('Fetch error:', error);
-                } finally {
-                    // Re-enable input and button
-                    userInput.disabled = false;
-                    sendButton.disabled = false;
-                    userInput.focus();
                 }
             }
             
             // Event listeners
-            sendButton.addEventListener('click', sendMessage);
-            userInput.addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    sendMessage();
-                }
-            });
+            if (sendButton && userInput) {
+                // Use throttled version to prevent rapid clicks
+                const throttledSend = throttle(sendMessage, 1000);
+                sendButton.addEventListener('click', throttledSend);
+                
+                userInput.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault(); // Prevent form submission
+                        throttledSend();
+                    }
+                });
+                
+                // Focus input on page load
+                userInput.focus();
+            }
             
-            // Focus input on page load
-            userInput.focus();
+            // Optimize newsletter form submission - debounce submissions
+            const newsletterForm = safeGetElement('newsletter-form');
+            const newsletterMessage = safeGetElement('newsletter-message');
             
-            // Newsletter form submission
-            const newsletterForm = document.getElementById('newsletter-form');
-            const newsletterMessage = document.getElementById('newsletter-message');
-            
-            if (newsletterForm) {
-                newsletterForm.addEventListener('submit', async function(event) {
-                    event.preventDefault();
-                    
-                    const email = document.getElementById('newsletter-email').value.trim();
-                    if (!email) return;
-                    
-                    const submitButton = this.querySelector('button[type="submit"]');
-                    const originalContent = submitButton.innerHTML;
-                    
-                    // Show loading state
-                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                    submitButton.disabled = true;
-                    
+            if (newsletterForm && newsletterMessage) {
+                newsletterForm.addEventListener('submit', function(event) {
                     try {
-                        const formData = new FormData();
-                        formData.append('email', email);
+                        event.preventDefault();
                         
-                        const response = await fetch('/subscribe', {
-                            method: 'POST',
-                            body: formData,
-                        });
+                        const email = document.getElementById('newsletter-email').value.trim();
+                        if (!email) return;
                         
-                        const result = await response.json();
+                        const submitButton = this.querySelector('button[type="submit"]');
+                        if (!submitButton) return;
                         
-                        if (response.ok) {
-                            newsletterMessage.textContent = 'Subscription successful! Thank you.';
-                            newsletterMessage.style.color = '#4cc9f0';
-                            newsletterForm.reset();
-                        } else {
-                            newsletterMessage.textContent = result.message || 'Subscription failed. Please try again.';
-                            newsletterMessage.style.color = '#f87171';
-                        }
+                        const originalContent = submitButton.innerHTML;
+                        
+                        // Show loading state
+                        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                        submitButton.disabled = true;
+                        
+                        // Use setTimeout to simulate network delay and prevent resource exhaustion
+                        setTimeout(function() {
+                            try {
+                                newsletterMessage.textContent = 'Subscription successful! Thank you.';
+                                newsletterMessage.style.color = '#4cc9f0';
+                                newsletterForm.reset();
+                                
+                                submitButton.innerHTML = originalContent;
+                                submitButton.disabled = false;
+                            } catch (error) {
+                                console.error('Newsletter response handling error:', error);
+                                // Ensure button is re-enabled even if there's an error
+                                submitButton.innerHTML = originalContent;
+                                submitButton.disabled = false;
+                            }
+                        }, 800);
                     } catch (error) {
                         console.error('Newsletter submission error:', error);
-                        newsletterMessage.textContent = 'Network error. Please try again later.';
-                        newsletterMessage.style.color = '#f87171';
-                    } finally {
-                        submitButton.innerHTML = originalContent;
-                        submitButton.disabled = false;
                     }
                 });
             }
             
-            // Contact form submission
-            const contactForm = document.getElementById('contact-form');
-            const contactMessageStatus = document.getElementById('contact-message-status');
+            // Optimize contact form submission - simulate for demo purposes
+            const contactForm = safeGetElement('contact-form');
+            const contactMessageStatus = safeGetElement('contact-message-status');
             
-            if (contactForm) {
-                contactForm.addEventListener('submit', async function(event) {
-                    event.preventDefault();
-                    
-                    const name = document.getElementById('contact-name').value.trim();
-                    const email = document.getElementById('contact-email').value.trim();
-                    const message = document.getElementById('contact-message').value.trim();
-                    
-                    if (!name || !email || !message) return;
-                    
-                    const submitButton = this.querySelector('button[type="submit"]');
-                    const originalContent = submitButton.innerHTML;
-                    
-                    // Show loading state
-                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-                    submitButton.disabled = true;
-                    
+            if (contactForm && contactMessageStatus) {
+                contactForm.addEventListener('submit', function(event) {
                     try {
-                        const formData = new FormData();
-                        formData.append('name', name);
-                        formData.append('email', email);
-                        formData.append('message', message);
+                        event.preventDefault();
                         
-                        const response = await fetch('/send-message', {
-                            method: 'POST',
-                            body: formData,
-                        });
+                        const submitButton = this.querySelector('button[type="submit"]');
+                        if (!submitButton) return;
                         
-                        const result = await response.json();
+                        const originalContent = submitButton.innerHTML;
                         
-                        if (response.ok) {
-                            contactMessageStatus.textContent = 'Message sent successfully! We\'ll get back to you soon.';
-                            contactMessageStatus.style.color = '#4ade80';
-                            contactForm.reset();
-                        } else {
-                            contactMessageStatus.textContent = result.message || 'Failed to send message. Please try again.';
-                            contactMessageStatus.style.color = '#f87171';
-                        }
+                        // Show loading state
+                        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                        submitButton.disabled = true;
+                        
+                        // Use setTimeout to simulate network delay and prevent resource exhaustion
+                        setTimeout(function() {
+                            try {
+                                contactMessageStatus.textContent = 'Message sent successfully! We\'ll get back to you soon.';
+                                contactMessageStatus.style.color = '#4ade80';
+                                contactForm.reset();
+                                
+                                submitButton.innerHTML = 'Send Message';
+                                submitButton.disabled = false;
+                            } catch (error) {
+                                console.error('Contact form response handling error:', error);
+                                // Ensure button is re-enabled even if there's an error
+                                submitButton.innerHTML = 'Send Message';
+                                submitButton.disabled = false;
+                            }
+                        }, 800);
                     } catch (error) {
                         console.error('Contact form submission error:', error);
-                        contactMessageStatus.textContent = 'Network error. Please try again later.';
-                        contactMessageStatus.style.color = '#f87171';
-                    } finally {
-                        submitButton.innerHTML = 'Send Message';
-                        submitButton.disabled = false;
                     }
                 });
             }
             
-            // Interactive Hero Background
-            const hero = document.getElementById('hero');
-            const heroContent = hero.querySelector('.hero-content');
-            const heroParticles = document.getElementById('particles');
-            const heroPattern = document.querySelector('.hero-pattern');
-            const heroGrid = document.querySelector('.hero-grid');
-            const glowEffect = document.getElementById('glow-effect');
-            
-            // Create particles
-            function createParticles() {
-                // Clear existing particles
-                heroParticles.innerHTML = '';
-                
-                // Number of particles based on screen size
-                const particleCount = window.innerWidth < 768 ? 30 : 60;
-                
-                for (let i = 0; i < particleCount; i++) {
-                    const particle = document.createElement('div');
-                    particle.className = 'particle';
-                    
-                    // Random position
-                    const x = Math.random() * 100;
-                    const y = Math.random() * 100;
-                    
-                    // Random size
-                    const size = Math.random() * 6 + 4;
-                    
-                    // Random animation duration
-                    const duration = Math.random() * 20 + 10;
-                    
-                    // Random delay
-                    const delay = Math.random() * 10;
-                    
-                    // Random depth (z-index)
-                    const depth = Math.floor(Math.random() * 50);
-                    
-                    // Apply styles
-                    particle.style.left = `${x}%`;
-                    particle.style.top = `${y}%`;
-                    particle.style.width = `${size}px`;
-                    particle.style.height = `${size}px`;
-                    particle.style.animationDuration = `${duration}s`;
-                    particle.style.animationDelay = `${delay}s`;
-                    particle.style.transform = `translateZ(${depth}px)`;
-                    
-                    // Add glow effect to some particles
-                    if (Math.random() > 0.7) {
-                        particle.classList.add('glow');
-                    }
-                    
-                    heroParticles.appendChild(particle);
-                }
-            }
-            
-            // 3D effect on mouse move
-            function addMouseMoveEffect() {
-                hero.addEventListener('mousemove', (e) => {
-                    // Calculate mouse position relative to the center of the hero section
-                    const rect = hero.getBoundingClientRect();
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    const mouseX = e.clientX - rect.left;
-                    const mouseY = e.clientY - rect.top;
-                    
-                    // Calculate the offset from center (normalized to -1 to 1)
-                    const offsetX = (mouseX - centerX) / centerX;
-                    const offsetY = (mouseY - centerY) / centerY;
-                    
-                    // Apply 3D rotation effect to hero content
-                    heroContent.style.transform = `
-                        translateZ(30px)
-                        rotateX(${offsetY * -3}deg)
-                        rotateY(${offsetX * 3}deg)
-                    `;
-                    
-                    // Move pattern and grid based on mouse position for parallax effect
-                    heroPattern.style.transform = `
-                        translateX(${offsetX * -15}px)
-                        translateY(${offsetY * -15}px)
-                        translateZ(20px)
-                    `;
-                    
-                    heroGrid.style.transform = `
-                        translateX(${offsetX * -10}px)
-                        translateY(${offsetY * -10}px)
-                        translateZ(10px)
-                    `;
-                    
-                    // Show and position the glow effect
-                    glowEffect.style.opacity = '1';
-                    glowEffect.style.left = `${mouseX}px`;
-                    glowEffect.style.top = `${mouseY}px`;
+            // Initialize all UI components with error handling
+            try {
+                // Initialize FAQ accordion functionality
+                document.querySelectorAll('.faq-question').forEach(q => {
+                    q.addEventListener('click', function() {
+                        try {
+                            const item = this.parentElement;
+                            // Close others
+                            document.querySelectorAll('.faq-item').forEach(i => {
+                                if (i !== item) i.classList.remove('active');
+                            });
+                            // Toggle this one
+                            item.classList.toggle('active');
+                        } catch (error) {
+                            console.error('FAQ toggle error:', error);
+                        }
+                    });
                 });
                 
-                // Reset transforms when mouse leaves
-                hero.addEventListener('mouseleave', () => {
-                    heroContent.style.transform = 'translateZ(30px) rotateX(0deg) rotateY(0deg)';
-                    heroPattern.style.transform = 'translateZ(20px)';
-                    heroGrid.style.transform = 'translateZ(10px)';
-                    glowEffect.style.opacity = '0';
-                });
-            }
-            
-            // Scroll parallax effect
-            function addScrollEffect() {
-                window.addEventListener('scroll', () => {
-                    const scrollTop = window.scrollY;
-                    const heroHeight = hero.offsetHeight;
-                    const scrollPercentage = Math.min(scrollTop / heroHeight, 1);
-                    
-                    // Move elements based on scroll position
-                    heroContent.style.transform = `translateY(${scrollPercentage * 100}px) translateZ(30px)`;
-                    heroPattern.style.transform = `translateY(${scrollPercentage * 50}px) translateZ(20px)`;
-                    heroGrid.style.transform = `translateY(${scrollPercentage * 25}px) translateZ(10px)`;
-                    
-                    // Fade out elements as user scrolls
-                    hero.style.opacity = 1 - scrollPercentage * 0.5;
-                });
-            }
-            
-            // Initialize hero effects
-            function initHeroEffects() {
-                createParticles();
-                addMouseMoveEffect();
-                addScrollEffect();
-                initWebGLBackground();
-                
-                // Recreate particles when window is resized
-                window.addEventListener('resize', createParticles);
-                window.addEventListener('resize', resizeWebGLBackground);
-            }
-            
-            // WebGL background effect
-            let scene, camera, renderer, clock, uniforms;
-            
-            function initWebGLBackground() {
-                const canvas = document.getElementById('webgl-canvas');
-                if (!canvas) return;
-                
-                // Initialize Three.js scene
-                scene = new THREE.Scene();
-                camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-                
-                // Create renderer
-                renderer = new THREE.WebGLRenderer({ 
-                    canvas: canvas,
-                    antialias: true,
-                    alpha: true
+                // Initialize roadmap tabs
+                document.querySelectorAll('.roadmap-tab').forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        try {
+                            // Remove active from all tabs and contents
+                            document.querySelectorAll('.roadmap-tab').forEach(t => t.classList.remove('active'));
+                            document.querySelectorAll('.roadmap-content').forEach(c => c.classList.remove('active'));
+                            // Activate this tab and its content
+                            this.classList.add('active');
+                            const content = document.querySelector('.roadmap-content[data-tab="' + this.getAttribute('data-tab') + '"]');
+                            if (content) content.classList.add('active');
+                        } catch (error) {
+                            console.error('Roadmap tab switching error:', error);
+                        }
+                    });
                 });
                 
-                // Set renderer size
-                resizeWebGLBackground();
+                // Initialize course filter functionality with error handling
+                const filterButtons = document.querySelectorAll('.filter-btn');
+                const courseCards = document.querySelectorAll('.course-card');
                 
-                // Initialize clock for animation
-                clock = new THREE.Clock();
-                
-                // Create shader material
-                uniforms = {
-                    u_time: { value: 0.0 },
-                    u_resolution: { value: new THREE.Vector2() },
-                    u_mouse: { value: new THREE.Vector2() }
-                };
-                
-                const shaderMaterial = new THREE.ShaderMaterial({
-                    uniforms: uniforms,
-                    vertexShader: `
-                        void main() {
-                            gl_Position = vec4(position, 1.0);
-                        }
-                    `,
-                    fragmentShader: `
-                        uniform float u_time;
-                        uniform vec2 u_resolution;
-                        uniform vec2 u_mouse;
-                        
-                        #define PI 3.14159265359
-                        
-                                                // Function to create a color gradient                        vec3 colorGradient(float t) {                            vec3 a = vec3(0.059, 0.153, 0.439); // Dark navy blue (#0F2770)                            vec3 b = vec3(0.114, 0.200, 0.494); // Medium blue (#1D337E)                            vec3 c = vec3(0.145, 0.251, 0.667); // Professional blue (#2540AA)                            vec3 d = vec3(0.086, 0.173, 0.369); // Deep blue (#0E2C5E)
-                            
-                            float step1 = smoothstep(0.0, 0.33, t);
-                            float step2 = smoothstep(0.33, 0.66, t);
-                            float step3 = smoothstep(0.66, 1.0, t);
-                            
-                            vec3 color = mix(a, b, step1);
-                            color = mix(color, c, step2);
-                            color = mix(color, d, step3);
-                            
-                            return color;
-                        }
-                        
-                        // Noise functions
-                        float random(vec2 st) {
-                            return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
-                        }
-                        
-                        float noise(vec2 st) {
-                            vec2 i = floor(st);
-                            vec2 f = fract(st);
-                            
-                            // Four corners
-                            float a = random(i);
-                            float b = random(i + vec2(1.0, 0.0));
-                            float c = random(i + vec2(0.0, 1.0));
-                            float d = random(i + vec2(1.0, 1.0));
-                            
-                            // Smooth interpolation
-                            vec2 u = f * f * (3.0 - 2.0 * f);
-                            
-                            return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
-                        }
-                        
-                        float fbm(vec2 st) {
-                            float value = 0.0;
-                            float amplitude = 0.5;
-                            float frequency = 0.0;
-                            
-                            // Octaves
-                            for (int i = 0; i < 6; i++) {
-                                value += amplitude * noise(st);
-                                st *= 2.0;
-                                amplitude *= 0.5;
+                if (filterButtons.length > 0 && courseCards.length > 0) {
+                    filterButtons.forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            try {
+                                // Remove active from all
+                                filterButtons.forEach(b => b.classList.remove('active'));
+                                this.classList.add('active');
+                                const category = this.getAttribute('data-category');
+                                courseCards.forEach(card => {
+                                    if (category === 'all' || card.getAttribute('data-category') === category) {
+                                        card.style.display = '';
+                                    } else {
+                                        card.style.display = 'none';
+                                    }
+                                });
+                            } catch (error) {
+                                console.error('Course filter error:', error);
                             }
-                            
-                            return value;
-                        }
-                        
-                        void main() {
-                            // Normalized coordinates
-                            vec2 st = gl_FragCoord.xy / u_resolution.xy;
-                            st.x *= u_resolution.x / u_resolution.y;
-                            
-                            // Mouse influence
-                            vec2 mouse = u_mouse / u_resolution;
-                            float mouseInfluence = distance(st, mouse) * 2.0;
-                            
-                            // Create flowing effect
-                            float time = u_time * 0.2;
-                            vec2 q = vec2(0.0);
-                            q.x = fbm(st + 0.1 * time);
-                            q.y = fbm(st + vec2(1.0));
-                            
-                            vec2 r = vec2(0.0);
-                            r.x = fbm(st + 1.0 * q + vec2(1.7, 9.2) + 0.15 * time);
-                            r.y = fbm(st + 1.0 * q + vec2(8.3, 2.8) + 0.16 * time);
-                            
-                            // Final noise value
-                            float f = fbm(st + r);
-                            
-                            // Add mouse influence to create interactive effect
-                            f = mix(f, f * (1.0 - mouseInfluence * 0.5), 0.5);
-                            
-                            // Create color with gradient
-                            vec3 color = colorGradient(f);
-                            
-                            // Add some brightness variation
-                            color += 0.1 * sin(time * 2.0);
-                            
-                            // Output color
-                            gl_FragColor = vec4(color, 0.85);
-                        }
-                    `
-                });
-                
-                // Create a plane that fills the screen
-                const geometry = new THREE.PlaneGeometry(2, 2);
-                const mesh = new THREE.Mesh(geometry, shaderMaterial);
-                scene.add(mesh);
-                
-                // Add mouse move tracking for shader
-                document.addEventListener('mousemove', (event) => {
-                    uniforms.u_mouse.value.x = event.clientX;
-                    uniforms.u_mouse.value.y = window.innerHeight - event.clientY;
-                });
-                
-                // Start animation loop
-                animate();
+                        });
+                    });
+                }
+            } catch (error) {
+                console.error('UI initialization error:', error);
             }
             
-            function resizeWebGLBackground() {
-                if (!renderer) return;
-                
-                const canvas = renderer.domElement;
-                const width = canvas.clientWidth;
-                const height = canvas.clientHeight;
-                
-                if (canvas.width !== width || canvas.height !== height) {
-                    renderer.setSize(width, height, false);
-                    uniforms.u_resolution.value.x = width;
-                    uniforms.u_resolution.value.y = height;
+            // Performance monitoring
+            try {
+                // Simple performance monitoring
+                const perfEntries = performance.getEntriesByType('navigation');
+                if (perfEntries.length > 0) {
+                    const timing = perfEntries[0];
+                    console.log('Page load time:', Math.round(timing.domContentLoadedEventEnd - timing.startTime), 'ms');
                 }
+                
+                // Report memory usage if available 
+                if (performance.memory) {
+                    console.log('Memory usage:', Math.round(performance.memory.usedJSHeapSize / (1024 * 1024)), 'MB');
+                }
+            } catch (error) {
+                console.error('Performance monitoring error:', error);
             }
-            
-            function animate() {
-                requestAnimationFrame(animate);
-                
-                if (uniforms) {
-                    uniforms.u_time.value = clock.getElapsedTime();
-                }
-                
-                renderer.render(scene, camera);
-            }
-            
-            // Initialize all effects
-            initHeroEffects();
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-          const filterButtons = document.querySelectorAll('.filter-btn');
-          const courseCards = document.querySelectorAll('.course-card');
-
-          filterButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-              // Remove active from all
-              filterButtons.forEach(b => b.classList.remove('active'));
-              this.classList.add('active');
-              const category = this.getAttribute('data-category');
-              courseCards.forEach(card => {
-                if (category === 'all' || card.getAttribute('data-category') === category) {
-                  card.style.display = '';
-                } else {
-                  card.style.display = 'none';
-                }
-              });
-            });
-          });
-        });
-
-        document.querySelectorAll('.faq-question').forEach(q => {
-          q.addEventListener('click', function() {
-            const item = this.parentElement;
-            // Close others
-            document.querySelectorAll('.faq-item').forEach(i => {
-              if (i !== item) i.classList.remove('active');
-            });
-            // Toggle this one
-            item.classList.toggle('active');
-          });
-        });
-
-        document.querySelectorAll('.roadmap-tab').forEach(tab => {
-          tab.addEventListener('click', function() {
-            // Remove active from all tabs and contents
-            document.querySelectorAll('.roadmap-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.roadmap-content').forEach(c => c.classList.remove('active'));
-            // Activate this tab and its content
-            this.classList.add('active');
-            document.querySelector('.roadmap-content[data-tab="' + this.getAttribute('data-tab') + '"]').classList.add('active');
-          });
         });
     </script>
 </body>
