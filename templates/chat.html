@@ -1925,10 +1925,12 @@
                     timeSpan.textContent = formatTime();
                     contentDiv.appendChild(timeSpan);
                     
-                    // Use fragment to minimize DOM updates
-                    const fragment = document.createDocumentFragment();
-                    fragment.appendChild(messageDiv);
-                    chatMessages.appendChild(fragment);
+                    // Add avatar and content to message div
+                    messageDiv.appendChild(avatarDiv);
+                    messageDiv.appendChild(contentDiv);
+                    
+                    // Add to chat messages
+                    chatMessages.appendChild(messageDiv);
                     
                     // Smoothly scroll to latest message
                     chatMessages.scrollTop = chatMessages.scrollHeight;
